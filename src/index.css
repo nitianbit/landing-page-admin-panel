@@ -1,0 +1,24 @@
+.flex-1 {
+  flex: 1;
+}
+
+.text-grey{
+  color: #555B6D;
+}
+
+.text-blue{
+  color: #8296EE;
+}
+
+.cursor-pointer{
+  cursor: pointer;
+}
+
+.font-weight-600{
+  font-weight: 600 !important;
+}
+
+.required:after {
+  content:" *";
+  color: red;
+}
