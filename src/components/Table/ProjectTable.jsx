@@ -100,8 +100,8 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
     return (
         <div >
             <button onClick={(e) => {
-                openModal(true);
-                // navigate("/projects/create")
+                // openModal(true);
+                navigate("/projects/create")
             }} className="btn btn-primary" type="submit">Add Project</button>
             <div className="container shadow-sm bg-white p-2 w-100">
                 <div className="table-wrapper">
@@ -123,7 +123,7 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
                                     <td>
                                         <MdEdit onClick={() => {
                                             // openModal(row)
-                                            navigate("/projects/create")
+                                            navigate("/projects/edit")
                                         }} className='cursor-pointer' color='#8296EE' />
                                         <MdDelete onClick={() => {
                                             setDeleteProjectId(row?._id)
@@ -154,7 +154,7 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
                 </div>
 
             </div>
-            {editState?.isModalOpen && <EditProject />}
+            {/* {editState?.isModalOpen && <EditProject />} */}
             {deleteProjectId && <Modal
                 header="Delete Project"
                 onSave={deleteProject}
