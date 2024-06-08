@@ -13,14 +13,14 @@ function Sidebar() {
                     <span className="fs-5 d-none d-sm-inline text-grey">Menu</span>
                 </Link>
                 <ul className="px-3 nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-                    <Link to="/users" className="nav-link align-middle px-0">
-                        <FaUser className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Users</span>
-                    </Link>
                     <Link to="/dashboard" className="nav-link px-0 align-middle  text-grey">
                         <MdDashboard className='text-grey' /> <span className="ms-1 d-none d-sm-inline text-grey">Dashboard</span>
                     </Link>
                     <Link to="/fields" className="nav-link align-middle px-0">
                         <FaUser className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Fields</span>
+                    </Link>
+                    <Link to="/projects" className="nav-link align-middle px-0">
+                        <FaUser className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Projects</span>
                     </Link>
                 </ul>
                 <hr />

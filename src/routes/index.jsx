@@ -1,4 +1,4 @@
-import { Dashboard, Users, Field } from '../pages'
+import { Dashboard, Users, Field, Projects, EditProject } from '../pages'
 
 export const authRoutes = [
     // {
@@ -29,4 +29,17 @@ export const protectedRoutes = [
         path: "/fields",
         element: <Field />
     },
+    {
+        path: "/projects",
+        element: <Projects />
+    }
+    ,
+    {
+        path: "/projects/create",
+        element: <EditProject />
+    },
+    {
+        path: "/projects/edit/:id",
+        element: <EditProject />
+    }
 ]

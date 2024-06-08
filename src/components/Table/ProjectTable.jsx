@@ -4,38 +4,41 @@ import { BsFillEyeFill } from "react-icons/bs";
 import { BsFillEyeSlashFill } from "react-icons/bs";
 import Modal from '../Modal/Modal';
 import EditUserContent from '../Modal/EditUserContent';
-import { FieldENDPOINTS } from '../../pages/FieldPage/Constant';
+import { ENDPOINTS } from '../../pages/Projects/Constant';
 import { doDELETE, doPOST, doPUT } from '../../utils/HttpUtil';
 import { AppContext } from '../../services/context/AppContext';
 import EditFieldContent from '../Modal/FieldsModal';
+import { useNavigate } from 'react-router-dom';
+import { EditProject } from '../../pages';
 
-const FieldTable = ({ tableData, getAllFields }) => {
+const ProjectTable = ({ tableData, getAllProjects }) => {
+
+    const navigate = useNavigate();
 
     const { success, error } = useContext(AppContext)
 
     const [data, setData] = useState(tableData?.rows);
     const [loading, setLoading] = useState(false)
-    const [addField, setAddField] = useState(false)
-    const [deleteFieldId, setDeleteFieldId] = useState(null)
+    const [deleteProjectId, setDeleteProjectId] = useState(null)
     const [editState, setEditState] = useState({
         isModalOpen: false,
-        selectedField: null
+        selectedProject: null
     })
 
     const handleUpdateData = async () => {
         try {
             setLoading(true)
-            if (!editState.selectedField?._id) {
-                await doPOST(FieldENDPOINTS.addField, editState.selectedField)
+            if (!editState.selectedProject?._id) {
+                await doPOST(ENDPOINTS.addProject, editState.selectedProject)
             } else {
-                await doPUT(FieldENDPOINTS.updateField(editState.selectedField?._id), editState.selectedField)
+                await doPUT(ENDPOINTS.updateProject(editState.selectedProject?._id), editState.selectedProject)
             }
             setEditState({
                 isModalOpen: false,
-                selectedField: null
+                selectedProject: null
             })
-            getAllFields()
-            success("Field Updated Successfully")
+            getAllProjects()
+            success("Project Updated Successfully")
         } catch (e) {
             error("Server error")
         } finally {
@@ -46,18 +49,18 @@ const FieldTable = ({ tableData, getAllFields }) => {
 
     const updateData = (updatedObj) => setEditState(prev => ({
         ...prev,
-        selectedField: {
-            ...prev.selectedField,
+        selectedProject: {
+            ...prev.selectedProject,
             ...updatedObj
         }
     }))
 
 
-    const openModal = (selectedField) => {
+    const openModal = (selectedProject) => {
         setEditState(prev => ({
             ...prev,
             isModalOpen: true,
-            selectedField
+            selectedProject
         }));
     };
 
@@ -66,17 +69,17 @@ const FieldTable = ({ tableData, getAllFields }) => {
         setEditState(prev => ({
             ...prev,
             isModalOpen: false,
-            selectedField: null
+            selectedProject: null
         }));
     };
 
-    const deleteField = async () => {
+    const deleteProject = async () => {
         try {
             setLoading(true)
-            const response = await doDELETE(FieldENDPOINTS.deleteField(deleteFieldId))
-            setDeleteFieldId(null)
-            getAllFields()
-            success("Field deleted Successfully")
+            const response = await doDELETE(ENDPOINTS.deleteProject(deleteProjectId))
+            setDeleteProjectId(null)
+            getAllProjects()
+            success("Project deleted Successfully")
         } catch (error) {
             error("server error")
 
@@ -87,7 +90,7 @@ const FieldTable = ({ tableData, getAllFields }) => {
     }
 
     const closeDeleteModal = () => {
-        setDeleteFieldId(null)
+        setDeleteProjectId(null)
     }
 
     useEffect(() => {
@@ -98,7 +101,8 @@ const FieldTable = ({ tableData, getAllFields }) => {
         <div >
             <button onClick={(e) => {
                 openModal(true);
-            }} className="btn btn-primary" type="submit">Add field</button>
+                // navigate("/projects/create")
+            }} className="btn btn-primary" type="submit">Add Project</button>
             <div className="container shadow-sm bg-white p-2 w-100">
                 <div className="table-wrapper">
                     <table className="table">
@@ -118,10 +122,11 @@ const FieldTable = ({ tableData, getAllFields }) => {
                                     <td>{row.type}</td>
                                     <td>
                                         <MdEdit onClick={() => {
-                                            openModal(row)
+                                            // openModal(row)
+                                            navigate("/projects/create")
                                         }} className='cursor-pointer' color='#8296EE' />
                                         <MdDelete onClick={() => {
-                                            setDeleteFieldId(row?._id)
+                                            setDeleteProjectId(row?._id)
                                         }} className='cursor-pointer' color='red' />
                                     </td>
                                 </tr>
@@ -149,37 +154,16 @@ const FieldTable = ({ tableData, getAllFields }) => {
                 </div>
 
             </div>
-            {editState?.isModalOpen &&
-                <Modal
-                    header="Edit Field"
-                    onSave={handleUpdateData}
-                    content={
-                        <EditFieldContent
-                            userData={editState?.selectedField}
-                            setUserData={updateData}
-                        />}
-                    isOpen={editState?.isModalOpen}
-                    onClose={closeEditModal} />}
-            {/* {addField && <Modal
-                header="Edit Field"
-                onSave={handleUpdateData}
-                content={
-                    <EditFieldContent
-                        userData={editState?.selectedField}
-                        setUserData={updateData}
-                    />}
-                isOpen={editState?.isModalOpen}
-                onClose={closeEditModal} />} */}
-
-            {deleteFieldId && <Modal
-                header="Delete Field"
-                onSave={deleteField}
-                content="Are You Sure you want to delete this Field?"
-                isOpen={deleteFieldId ? true : false}
+            {editState?.isModalOpen && <EditProject />}
+            {deleteProjectId && <Modal
+                header="Delete Project"
+                onSave={deleteProject}
+                content="Are You Sure you want to delete this Project?"
+                isOpen={deleteProjectId ? true : false}
                 onClose={closeDeleteModal} />
             }
         </div>
     );
 };
 
-export default FieldTable;
+export default ProjectTable;

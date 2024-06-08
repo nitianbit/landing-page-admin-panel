@@ -1,4 +1,4 @@
-export const ENDPOINTS = {
+export const FieldENDPOINTS = {
     addField: `addField`,
     getFields: `getField`,
     getFieldById: (id) => `fields/${id}`,
