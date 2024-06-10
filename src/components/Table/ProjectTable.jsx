@@ -110,7 +110,6 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
                             <tr>
                                 <th className='font-weight-600' scope="col">#</th>
                                 <th className='font-weight-600' scope="col">Name</th>
-                                <th className='font-weight-600' scope="col">Type</th>
                                 <th className='font-weight-600' scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -118,12 +117,10 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
                             {data?.map((row, index) => (
                                 <tr key={row?.id}>
                                     <th scope="row">{index + 1}</th>
-                                    <td>{row.label}</td>
-                                    <td>{row.type}</td>
+                                    <td>{row.name}</td>
                                     <td>
                                         <MdEdit onClick={() => {
-                                            // openModal(row)
-                                            navigate("/projects/edit")
+                                            navigate(`/projects/edit/${row?._id}`)
                                         }} className='cursor-pointer' color='#8296EE' />
                                         <MdDelete onClick={() => {
                                             setDeleteProjectId(row?._id)

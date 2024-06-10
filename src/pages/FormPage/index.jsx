@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { UserTable } from '../../components'
-import { ENDPOINTS } from './Constant';
+import { FORMENDPOINTS } from './Constant';
 import { doGET } from '../../utils/HttpUtil';
 import FieldTable from '../../components/Table/FieldTable';
 
@@ -10,7 +10,7 @@ const Field = () => {
 
     const getAllForms = async (e) => {
         try {
-            const response = await doGET(ENDPOINTS.getForms);
+            const response = await doGET(FORMENDPOINTS.getForms);
             setUsers(response)
         } catch (error) { }
     };

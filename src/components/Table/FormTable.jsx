@@ -4,7 +4,7 @@ import { BsFillEyeFill } from "react-icons/bs";
 import { BsFillEyeSlashFill } from "react-icons/bs";
 import Modal from '../Modal/Modal';
 import EditUserContent from '../Modal/EditUserContent';
-import { ENDPOINTS } from '../../pages/FieldPage/Constant';
+import { FieldENDPOINTS } from '../../pages/FieldPage/Constant';
 import { doDELETE, doPOST, doPUT } from '../../utils/HttpUtil';
 import { AppContext } from '../../services/context/AppContext';
 import EditFieldContent from '../Modal/FieldsModal';
@@ -26,9 +26,9 @@ const FieldTable = ({ tableData, getAllFields }) => {
         try {
             setLoading(true)
             if (!editState.selectedField?._id) {
-                await doPOST(ENDPOINTS.addField, editState.selectedField)
+                await doPOST(FieldENDPOINTS.addField, editState.selectedField)
             } else {
-                await doPUT(ENDPOINTS.updateField(editState.selectedField?._id), editState.selectedField)
+                await doPUT(FieldENDPOINTS.updateField(editState.selectedField?._id), editState.selectedField)
             }
             setEditState({
                 isModalOpen: false,
@@ -73,7 +73,7 @@ const FieldTable = ({ tableData, getAllFields }) => {
     const deleteField = async () => {
         try {
             setLoading(true)
-            const response = await doDELETE(ENDPOINTS.deleteField(deleteFieldId))
+            const response = await doDELETE(FieldENDPOINTS.deleteField(deleteFieldId))
             setDeleteFieldId(null)
             getAllFields()
             success("Field deleted Successfully")
