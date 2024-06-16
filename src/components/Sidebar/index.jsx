@@ -22,6 +22,9 @@ function Sidebar() {
                     <Link to="/projects" className="nav-link align-middle px-0">
                         <FaUser className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Projects</span>
                     </Link>
+                    <Link to="/leads" className="nav-link align-middle px-0">
+                        <FaUser className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Leads</span>
+                    </Link>
                 </ul>
                 <hr />
             </div>

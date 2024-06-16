@@ -3,6 +3,6 @@ export const FORMENDPOINTS = {
     getForms: `getForm`,
     getFormById: (id) => `Forms/${id}`,
     updateForm: (id) => `Forms/${id}`,
-    getFormByProjectId: (id) => `/projects/${id}/Forms`
+    getFormByProjectId: (id) => `/projects/${id}/Forms`,
     // deleteForm: (id) => `Forms/${id}`,
 }

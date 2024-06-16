@@ -5,7 +5,7 @@ import { ENDPOINTS } from './Constant';
 import { FORMENDPOINTS } from '../FormPage/Constant';
 import { FieldENDPOINTS } from '../FieldPage/Constant';
 
-const EditProject = () => {
+const EditLead = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [project, setProject] = useState({
@@ -201,4 +201,4 @@ const EditProject = () => {
     );
 };
 
-export default EditProject;
+export default EditLead;
