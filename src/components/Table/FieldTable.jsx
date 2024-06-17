@@ -95,11 +95,11 @@ const FieldTable = ({ tableData, getAllFields }) => {
     }, [tableData])
 
     return (
-        <div >
+        <div className='w-100'>
             <button onClick={(e) => {
                 openModal(true);
             }} className="btn btn-primary" type="submit">Add field</button>
-            <div className="container shadow-sm bg-white p-2 w-100">
+            <div className="container shadow-sm bg-white p-2 my-2 w-100">
                 <div className="table-wrapper">
                     <table className="table">
                         <thead style={{ fontWeight: 600 }}>

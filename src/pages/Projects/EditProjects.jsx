@@ -4,6 +4,7 @@ import { doGET, doPOST, doPUT } from '../../utils/HttpUtil';
 import { ENDPOINTS } from './Constant';
 import { FORMENDPOINTS } from '../FormPage/Constant';
 import { FieldENDPOINTS } from '../FieldPage/Constant';
+import { Card } from 'reactstrap';
 
 const EditProject = () => {
     const { id } = useParams();
@@ -129,7 +130,7 @@ const EditProject = () => {
 
     return (
         <div className='container'>
-            <form onSubmit={handleProjectSubmit} className='mt-3'>
+            <Card onSubmit={handleProjectSubmit} className='mt-3 p-2 px-3'>
                 <div className="mb-3">
                     <label className='mb-1'>Project Name</label>
                     <input
@@ -152,26 +153,33 @@ const EditProject = () => {
                         placeholder="Enter Description"
                     />
                 </div>
-                <button type="submit" className="btn btn-primary">Save Project</button>
-            </form>
+                <button onClick={handleProjectSubmit} className="btn btn-outline-success" style={{
+                    position: "relative",
+                    width: "120px"
+                }}>Save Project</button>
+            </Card>
 
             {project?._id && (
                 <div className='mt-3'>
-                    <button type="button" className="btn btn-success mb-2" onClick={addForm}>Add Form</button>
+                    <button type="button" className="btn btn-primary ms-1 mb-2" onClick={addForm}>Add Form</button>
                     {forms?.map((form, formIndex) => (
-                        <div key={formIndex} className="mb-3">
+                        <Card key={formIndex} className="mb-3 px-4 py-2">
                             <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, project._id); }}>
-                                <label className='mb-1'>Form Title</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    value={form.title}
-                                    onChange={(e) => handleFormChange(formIndex, 'title', e.target.value)}
-                                    placeholder="Enter Form Title"
-                                />
-                                <button type="button" className="btn btn-secondary m-2" onClick={() => addFieldToForm(formIndex)}>Add Field</button>
+                                <div className='d-flex align-items-end my-2'>
+                                    <div>
+                                        <label className='mb-1'>Form Title</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={form.title}
+                                            onChange={(e) => handleFormChange(formIndex, 'title', e.target.value)}
+                                            placeholder="Enter Form Title"
+                                        />
+                                    </div>
+                                    <button type="button" className="btn btn-secondary mx-2" onClick={() => addFieldToForm(formIndex)}>Add Field</button>
+                                </div>
                                 {form?.fields?.map((field, fieldIndex) => (
-                                    <div key={fieldIndex} className="input-group mb-2">
+                                    <div key={fieldIndex} className="input-group mb-2 w-50">
                                         <select
                                             className="form-select"
                                             value={field?._id || ''}
@@ -193,7 +201,7 @@ const EditProject = () => {
                                 ))}
                                 <button type="submit" className="btn btn-primary">Save Form</button>
                             </form>
-                        </div>
+                        </Card>
                     ))}
                 </div>
             )}

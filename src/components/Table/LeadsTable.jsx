@@ -11,13 +11,13 @@ import EditFieldContent from '../Modal/FieldsModal';
 import { useNavigate } from 'react-router-dom';
 import { EditProject } from '../../pages';
 
-const ProjectTable = ({ tableData, getAllProjects }) => {
+const LeadsTable = ({ tableData, tableHeaders }) => {
 
     const navigate = useNavigate();
 
     const { success, error } = useContext(AppContext)
 
-    const [data, setData] = useState(tableData?.rows);
+    const [data, setData] = useState(tableData);
     const [loading, setLoading] = useState(false)
     const [deleteProjectId, setDeleteProjectId] = useState(null)
     const [editState, setEditState] = useState({
@@ -95,37 +95,44 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
 
     useEffect(() => {
         setData(tableData)
+        console.log(tableData)
     }, [tableData])
 
     return (
-        <div className='w-100'>
-            <button onClick={(e) => {
-                // openModal(true);
-                navigate("/projects/create")
-            }} className="btn btn-primary my-2" type="submit">Add Project</button>
+        <div >
             <div className="container shadow-sm bg-white p-2 w-100">
                 <div className="table-wrapper">
                     <table className="table">
                         <thead style={{ fontWeight: 600 }}>
                             <tr>
                                 <th className='font-weight-600' scope="col">#</th>
-                                <th className='font-weight-600' scope="col">Name</th>
-                                <th className='font-weight-600' scope="col">Actions</th>
+                                {
+                                    tableHeaders ?
+                                        tableHeaders?.map((item, thIndex) => {
+                                            return <th key={thIndex} className='font-weight-600' scope="col">{item?.label}</th>
+                                        }) : null
+                                }
                             </tr>
                         </thead>
                         <tbody className='text-grey'>
                             {data?.map((row, index) => (
                                 <tr key={row?.id}>
-                                    <th scope="row">{index + 1}</th>
-                                    <td>{row.name}</td>
-                                    <td>
+                                    <td scope="row">{index + 1}</td>
+                                    {
+                                        row?.values ?
+                                            row?.values?.map((tdValue, tdIndex) => {
+                                                return <td>{tdValue?.value}</td>
+                                            })
+                                            : null
+                                    }
+                                    {/* <td>
                                         <MdEdit onClick={() => {
                                             navigate(`/projects/edit/${row?._id}`)
                                         }} className='cursor-pointer' color='#8296EE' />
                                         <MdDelete onClick={() => {
                                             setDeleteProjectId(row?._id)
                                         }} className='cursor-pointer' color='red' />
-                                    </td>
+                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>
@@ -163,4 +170,4 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
     );
 };
 
-export default ProjectTable;
+export default LeadsTable;

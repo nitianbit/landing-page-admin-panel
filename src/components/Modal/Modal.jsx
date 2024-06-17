@@ -5,7 +5,7 @@ const Modal = ({ header, content, onSave, onClose, isOpen }) => {
     return (
         <div>
             {/* Modal */}
-            <div className={`modal fade ${isOpen ? 'show' : ''}`} style={{ display: isOpen ? 'block' : 'none' }} tabIndex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden={!isOpen}>
+            <div className={`modal fade ${isOpen ? 'show' : ''}`} style={{ display: isOpen ? 'block' : 'none', backgroundColor: "rgba(0, 0, 0, 0.5)" }} tabIndex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden={!isOpen}>
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
                         <div className="modal-header">

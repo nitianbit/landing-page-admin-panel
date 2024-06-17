@@ -21,7 +21,7 @@ export const AppProvider = ({ children }) => {
 
     const getCurrentUser = async (e) => {
         try {
-            const response = await doGET(ENDPOINTS.profile);
+            const response = await doGET(ENDPOINTS?.profile);
             setUserData(response?.data)
         } catch (error) { }
     };

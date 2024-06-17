@@ -1,7 +1,14 @@
 export const ENDPOINTS = {
     // addLead: `addProject`,
-    getLeads: `getProjects`,
-    getProjectById: (id) => `project/${id}`,
-    updateProject: (id) => `project/${id}`,
+    getProjects: 'getProjects',
+    getProjectFormValue: (projectId, formId) => `/getFormValues/${projectId}/${formId}`,
+
+    getFormByProjectId: (id) => `/projects/${id}/Forms`,
+
+    getProjectFormLead: (projectId, formId) => `/getFormValues/${projectId}/${formId}`,
+
+    getProjectById: (id) => `/project/${id}`,
+
+    updateProject: (id) => `/project/${id}`,
     deleteProject: (id) => `project/${id}`,
 }
