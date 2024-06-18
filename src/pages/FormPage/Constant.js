@@ -1,8 +1,8 @@
 export const FORMENDPOINTS = {
     addForm: `addForm`,
-    getForms: `getForm`,
-    getFormById: (id) => `Forms/${id}`,
-    updateForm: (id) => `Forms/${id}`,
-    getFormByProjectId: (id) => `/projects/${id}/Forms`,
+    getForms: `getForms`,
+    getFormById: (id) => `form/${id}`,
+    updateForm: (id) => `form/${id}`,
+    getFormByProjectId: (id) => `/project/${id}/forms`,
     // deleteForm: (id) => `Forms/${id}`,
 }

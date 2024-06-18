@@ -1,7 +1,7 @@
 export const FieldENDPOINTS = {
     addField: `addField`,
-    getFields: `getField`,
-    getFieldById: (id) => `fields/${id}`,
-    updateField: (id) => `fields/${id}`,
-    deleteField: (id) => `fields/${id}`,
+    getFields: `getFields`,
+    getFieldById: (id) => `field/${id}`,
+    updateField: (id) => `field/${id}`,
+    deleteField: (id) => `field/${id}`,
 }

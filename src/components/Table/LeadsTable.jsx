@@ -125,14 +125,6 @@ const LeadsTable = ({ tableData, tableHeaders }) => {
                                             })
                                             : null
                                     }
-                                    {/* <td>
-                                        <MdEdit onClick={() => {
-                                            navigate(`/projects/edit/${row?._id}`)
-                                        }} className='cursor-pointer' color='#8296EE' />
-                                        <MdDelete onClick={() => {
-                                            setDeleteProjectId(row?._id)
-                                        }} className='cursor-pointer' color='red' />
-                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>
@@ -158,14 +150,6 @@ const LeadsTable = ({ tableData, tableHeaders }) => {
                 </div>
 
             </div>
-            {/* {editState?.isModalOpen && <EditProject />} */}
-            {deleteProjectId && <Modal
-                header="Delete Project"
-                onSave={deleteProject}
-                content="Are You Sure you want to delete this Project?"
-                isOpen={deleteProjectId ? true : false}
-                onClose={closeDeleteModal} />
-            }
         </div>
     );
 };
