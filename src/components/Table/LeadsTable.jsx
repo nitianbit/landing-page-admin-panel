@@ -1,102 +1,30 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { MdEdit, MdDelete } from "react-icons/md";
-import { BsFillEyeFill } from "react-icons/bs";
-import { BsFillEyeSlashFill } from "react-icons/bs";
-import Modal from '../Modal/Modal';
-import EditUserContent from '../Modal/EditUserContent';
-import { ENDPOINTS } from '../../pages/Projects/Constant';
-import { doDELETE, doPOST, doPUT } from '../../utils/HttpUtil';
-import { AppContext } from '../../services/context/AppContext';
-import EditFieldContent from '../Modal/FieldsModal';
-import { useNavigate } from 'react-router-dom';
-import { EditProject } from '../../pages';
+import React, { useEffect, useState } from 'react';
 
 const LeadsTable = ({ tableData, tableHeaders }) => {
 
-    const navigate = useNavigate();
-
-    const { success, error } = useContext(AppContext)
-
     const [data, setData] = useState(tableData);
-    const [loading, setLoading] = useState(false)
-    const [deleteProjectId, setDeleteProjectId] = useState(null)
-    const [editState, setEditState] = useState({
-        isModalOpen: false,
-        selectedProject: null
-    })
-
-    const handleUpdateData = async () => {
-        try {
-            setLoading(true)
-            if (!editState.selectedProject?._id) {
-                await doPOST(ENDPOINTS.addProject, editState.selectedProject)
-            } else {
-                await doPUT(ENDPOINTS.updateProject(editState.selectedProject?._id), editState.selectedProject)
-            }
-            setEditState({
-                isModalOpen: false,
-                selectedProject: null
-            })
-            getAllProjects()
-            success("Project Updated Successfully")
-        } catch (e) {
-            error("Server error")
-        } finally {
-            setLoading(false)
-
-        }
-    }
-
-    const updateData = (updatedObj) => setEditState(prev => ({
-        ...prev,
-        selectedProject: {
-            ...prev.selectedProject,
-            ...updatedObj
-        }
-    }))
-
-
-    const openModal = (selectedProject) => {
-        setEditState(prev => ({
-            ...prev,
-            isModalOpen: true,
-            selectedProject
-        }));
-    };
-
-
-    const closeEditModal = () => {
-        setEditState(prev => ({
-            ...prev,
-            isModalOpen: false,
-            selectedProject: null
-        }));
-    };
-
-    const deleteProject = async () => {
-        try {
-            setLoading(true)
-            const response = await doDELETE(ENDPOINTS.deleteProject(deleteProjectId))
-            setDeleteProjectId(null)
-            getAllProjects()
-            success("Project deleted Successfully")
-        } catch (error) {
-            error("server error")
-
-        }
-        finally {
-            setLoading(false)
-        }
-    }
-
-    const closeDeleteModal = () => {
-        setDeleteProjectId(null)
-    }
 
     useEffect(() => {
-        setData(tableData)
-        console.log(tableData)
-    }, [tableData])
+        const updatedData = tableData?.map(rowValues => {
+            const row = tableHeaders?.map(item => {
+                const found = rowValues?.values?.find(value => value.fieldId === item._id);
+                return found?.value;
+            });
+
+            rowValues.utmParameters = rowValues.utmParameters || {};
+            rowValues.ipAddress = rowValues.ipAddress || '';
+
+            return {
+                ...rowValues,
+                utmParameters: rowValues.utmParameters,
+                ipAddress: rowValues.ipAddress,
+                values: row,
+            };
+        });
+
+        setData(updatedData);
+
+    }, [tableData, tableHeaders])
 
     return (
         <div >
@@ -106,25 +34,28 @@ const LeadsTable = ({ tableData, tableHeaders }) => {
                         <thead style={{ fontWeight: 600 }}>
                             <tr>
                                 <th className='font-weight-600' scope="col">#</th>
-                                {
-                                    tableHeaders ?
-                                        tableHeaders?.map((item, thIndex) => {
-                                            return <th key={thIndex} className='font-weight-600' scope="col">{item?.label}</th>
-                                        }) : null
-                                }
+                                {tableHeaders?.map((item, thIndex) => (
+                                    <th key={thIndex} className='font-weight-600' scope="col">{item?.label}</th>
+                                ))}
+                                <th>IP Address</th>
+                                <th>UTM Parameters</th>
                             </tr>
                         </thead>
                         <tbody className='text-grey'>
                             {data?.map((row, index) => (
                                 <tr key={row?.id}>
                                     <td scope="row">{index + 1}</td>
-                                    {
-                                        row?.values ?
-                                            row?.values?.map((tdValue, tdIndex) => {
-                                                return <td>{tdValue?.value}</td>
-                                            })
-                                            : null
-                                    }
+                                    {row?.values?.map((tdValue, tdIndex) => (
+                                        <td key={tdIndex}>{tdValue}</td>
+                                    ))}
+                                    <td>
+                                        {row?.ipAddress}
+                                    </td>
+                                    <td>
+                                        {Object?.entries(row?.utmParameters || {}).map(([key, value]) => (
+                                            <li key={key}>{`${key}: ${value}`}</li>
+                                        ))}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
