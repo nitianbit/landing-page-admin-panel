@@ -1,17 +1,17 @@
-import { Dashboard, Users, Field, Projects, EditProject } from '../pages'
+import { Dashboard, Users, Field, Projects, EditProject, LandingPage, Login } from '../pages'
 import Leads from '../pages/Leads';
 
 export const authRoutes = [
-    // {
-    //     path: "/",
-    //     element: <Login />,
+    {
+        path: "/",
+        element: <LandingPage />,
 
-    // },
-    // {
-    //     path: "/signup",
-    //     element: <Signup />,
+    },
+    {
+        path: "/login",
+        element: <Login />,
 
-    // },
+    },
 ]
 
 export const openRoutes = [];

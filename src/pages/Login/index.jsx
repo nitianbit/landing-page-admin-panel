@@ -9,14 +9,14 @@ import { STORAGE_KEYS } from '../../services/Storage';
 function Login() {
     const navigate = useNavigate();
 
-    const { success, error, setIsLoggedIn, setUserData} = useContext(AppContext)
+    const { success, error, setIsLoggedIn, setUserData } = useContext(AppContext)
 
     const [data, setData] = useState({})
 
     const isLoggedIn = localStorage.getItem(STORAGE_KEYS.TOKEN)
 
     const login = async () => {
-        if ((!data?.phone || !data?.password)) {
+        if ((!data?.email || !data?.password)) {
             return error('Please Enter all required Fields');
         }
         try {
@@ -33,11 +33,11 @@ function Login() {
         }
     }
 
-    useEffect(() => {
-        if (isLoggedIn) {
-            navigate('/dashboard')
-        }
-    }, [])
+    // useEffect(() => {
+    //     if (isLoggedIn) {
+    //         navigate('/dashboard')
+    //     }
+    // }, [])
     return (
         <section className="bg-light py-3 py-md-5">
             <div className="container">
@@ -60,20 +60,19 @@ function Login() {
                                     <div className="col-12">
                                         <div className="form-floating mb-3">
                                             <input
-                                                value={data?.phone}
+                                                value={data?.email}
                                                 onChange={(v) => {
                                                     setData(prevData => ({
                                                         ...prevData,
-                                                        phone: v.target.value
+                                                        email: v.target.value
                                                     }))
                                                 }}
-                                                type="number"
+                                                type="text"
                                                 className="form-control"
-                                                name="Phone"
-                                                // id="phone"
-                                                placeholder='Phone'
+                                                name="Email"
+                                                placeholder='Email'
                                                 required />
-                                            <label className="form-label">Phone</label>
+                                            <label className="form-label">Email</label>
                                         </div>
                                     </div>
                                     <div className="col-12">
@@ -88,7 +87,6 @@ function Login() {
                                                 type="password"
                                                 className="form-control"
                                                 name="password"
-                                                // id="password"
                                                 value={data?.password}
                                                 placeholder="Password"
                                                 required />
@@ -114,11 +112,11 @@ function Login() {
                                             }} className="btn btn-primary btn-lg" type="submit">Log in</button>
                                         </div>
                                     </div>
-                                    <div className="col-12">
+                                    {/* <div className="col-12">
                                         <p className="m-0 text-secondary text-center">Don't have an account? <span onClick={() => {
                                             navigate("/signup")
                                         }} className="link-primary text-decoration-none cursor-pointer">Sign up</span></p>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

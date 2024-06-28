@@ -7,7 +7,7 @@ export const API_METHODS = {
 }
 
 export const ENDPOINTS = {
-    login: '/auth/login',
-    register: '/auth/signup',
-    profile: '/profile/get',
+    login: '/login',
+    register: '/signup',
+    profile: '/get',
 }

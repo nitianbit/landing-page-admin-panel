@@ -5,6 +5,7 @@ import Users from "./Users/Users";
 import Field from './FieldPage/index'
 import Projects from "./Projects";
 import EditProject from "./Projects/EditProjects";
+import LandingPage from './LandingPage/components/LandingPage/LandingPage'
 
 export {
     Login,
@@ -13,5 +14,6 @@ export {
     Users,
     Field,
     Projects,
-    EditProject
+    EditProject,
+    LandingPage
 }
