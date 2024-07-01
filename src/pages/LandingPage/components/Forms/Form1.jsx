@@ -3,15 +3,18 @@ import React, { useState } from 'react';
 const Form1 = ({ form, handleSubmit }) => {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(false);
+    const [phoneNo, setPhoneNo] = useState(null)
 
-    const handleInputChange = (fieldName, value) => {
+
+    const handleInputChange = (fieldName, value, type) => {
         setData(prevData => ({
             ...prevData,
             [fieldName]: value
         }));
+        if ((type == "number" && (fieldName == "Phone" || fieldName == "phone")) ? value : null) {
+            setPhoneNo((type == "number" && (fieldName == "Phone" || fieldName == "phone")) ? value : null)
+        }
     };
-
-    const isForm1 = form?.title === "Form1";
 
     return (
         <form>
@@ -34,7 +37,7 @@ const Form1 = ({ form, handleSubmit }) => {
                     <div className="mb-6" key={`${field?._id}-${index}`}>
                         <input
                             value={data[field?.label] || ''}
-                            onChange={(e) => handleInputChange(field?.label, e.target.value)}
+                            onChange={(e) => handleInputChange(field?.label, e.target.value, field?.type)}
                             type={field?.type}
                             id={field?.label.toLowerCase()}
                             className="mt-1 block w-full px-3 py-2 border border-[#dddcdb] rounded-2xl shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-[#f6f2ec]"
@@ -55,7 +58,7 @@ const Form1 = ({ form, handleSubmit }) => {
             </div>
             <button
                 onClick={(e) => {
-                    handleSubmit(e, form, data).then(res => {
+                    handleSubmit(e, form, data, phoneNo).then(res => {
                         res && setData({})
                     })
                 }}

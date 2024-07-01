@@ -38,7 +38,7 @@ function LandingPage() {
       const utmParameters = getUTMParameters();
 
       // Send form data to backend
-      let response = await doPOST("/addFormValue", { formId, values, projectId: "666de33f3d5ee559944dd6ad", utmParameters });
+      let response = await doPOST("/addFormValue", { formId, values, projectId: project?._ido, utmParameters, ...(phone && { phone }) });
 
       // Handle response
       if (response.success) {
