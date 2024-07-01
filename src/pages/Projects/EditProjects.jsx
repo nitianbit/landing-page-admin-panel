@@ -153,6 +153,17 @@ const EditProject = () => {
                         placeholder="Enter Description"
                     />
                 </div>
+                <div className="mb-3">
+                    <label className='mb-1'>Enter Domain</label>
+                    <input
+                        type="text"
+                        name="domain"
+                        className="form-control"
+                        value={project?.domain}
+                        onChange={handleChange}
+                        placeholder="Enter Domain"
+                    />
+                </div>
                 <button onClick={handleProjectSubmit} className="btn btn-outline-success" style={{
                     position: "relative",
                     width: "120px"
@@ -199,6 +210,17 @@ const EditProject = () => {
                                         </button>
                                     </div>
                                 ))}
+                                <div>
+                                    <div className="form-check m-2">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckIndeterminate"
+                                            checked={form?.showOTP}
+                                            onChange={(e) => handleFormChange(formIndex, 'showOTP', e.target.checked)}
+                                        />
+                                        <label class="form-check-label" for="flexCheckIndeterminate">
+                                            Show OTP
+                                        </label>
+                                    </div>
+                                </div>
                                 <button type="submit" className="btn btn-primary">Save Form</button>
                             </form>
                         </Card>
