@@ -9,6 +9,7 @@ export const AppContext = createContext("");
 export const AppProvider = ({ children }) => {
     const [userData, setUserData] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isAppReady, setIsAppReady] = useState(false)
 
     const success = (message) => toast.success(message);
     const error = (message) => toast.error(message);
@@ -16,9 +17,14 @@ export const AppProvider = ({ children }) => {
     const getCurrentUser = async () => {
         try {
             const response = await doGET(ENDPOINTS?.profile);
-            setUserData(response?.data);
+            setUserData(response);
+            if (response) {
+                setIsLoggedIn(true)
+            }
         } catch (error) {
             error('Failed to fetch user data');
+        } finally {
+            setIsAppReady(true);
         }
     };
 
@@ -33,6 +39,8 @@ export const AppProvider = ({ children }) => {
         if (token) {
             setIsLoggedIn(true);
             getCurrentUser();
+        } else {
+            setIsAppReady(true)
         }
     }, []);
 
@@ -46,6 +54,7 @@ export const AppProvider = ({ children }) => {
                 isLoggedIn,
                 setIsLoggedIn,
                 logout,
+                isAppReady,
             }}
         >
             {children}
