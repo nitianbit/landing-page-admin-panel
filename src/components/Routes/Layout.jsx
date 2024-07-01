@@ -5,7 +5,10 @@ import { Navbar, SideBar } from '..';
 import './style.css';
 
 const Layout = () => {
-    const { isLoggedIn } = useContext(AppContext);
+    const { isLoggedIn, isAppReady } = useContext(AppContext);
+    if (!isAppReady) {
+        return null
+    }
 
     return isLoggedIn ? (
         <div className='d-flex'>
