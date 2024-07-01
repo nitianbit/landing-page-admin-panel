@@ -10,35 +10,31 @@ export const AppProvider = ({ children }) => {
     const [userData, setUserData] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const success = (message) => {
-        return toast.success(message);
-    };
+    const success = (message) => toast.success(message);
+    const error = (message) => toast.error(message);
 
-    const error = (message) => {
-        return toast.error(message)
-    }
-
-
-    const getCurrentUser = async (e) => {
+    const getCurrentUser = async () => {
         try {
             const response = await doGET(ENDPOINTS?.profile);
-            setUserData(response?.data)
-        } catch (error) { }
+            setUserData(response?.data);
+        } catch (error) {
+            error('Failed to fetch user data');
+        }
     };
 
     const logout = () => {
         localStorage.clear();
         setIsLoggedIn(false);
-        success("Logout Successfully")
-    }
+        success("Logout Successfully");
+    };
 
     useEffect(() => {
         const token = getValue(STORAGE_KEYS.TOKEN);
         if (token) {
             setIsLoggedIn(true);
-            getCurrentUser()
+            getCurrentUser();
         }
-    }, [])
+    }, []);
 
     return (
         <AppContext.Provider
@@ -47,11 +43,12 @@ export const AppProvider = ({ children }) => {
                 setUserData,
                 success,
                 error,
-                isLoggedIn, setIsLoggedIn,
-                logout
+                isLoggedIn,
+                setIsLoggedIn,
+                logout,
             }}
         >
             {children}
         </AppContext.Provider>
     );
-}
+};

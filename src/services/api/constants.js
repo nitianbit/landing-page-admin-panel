@@ -6,8 +6,10 @@ export const API_METHODS = {
     PUT: 'PUT'
 }
 
+
+
 export const ENDPOINTS = {
     login: '/login',
     register: '/signup',
-    profile: '/get',
+    profile: '/getCurrentUser',
 }

@@ -1,43 +1,38 @@
-import React, { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/logo.png'
-import { doPOST } from '../../utils/HttpUtil';
-import { ENDPOINTS } from '../../services/api/constants';
 import { AppContext } from '../../services/context/AppContext';
+import { doPOST } from '../../utils/HttpUtil';
 import { STORAGE_KEYS } from '../../services/Storage';
+import { ENDPOINTS } from '../../services/api/constants';
 
-function Login() {
+const Login = () => {
     const navigate = useNavigate();
+    const { success, error, setIsLoggedIn, setUserData } = useContext(AppContext);
+    const [data, setData] = useState({});
 
-    const { success, error, setIsLoggedIn, setUserData } = useContext(AppContext)
-
-    const [data, setData] = useState({})
-
-    const isLoggedIn = localStorage.getItem(STORAGE_KEYS.TOKEN)
+    useEffect(() => {
+        if (localStorage.getItem(STORAGE_KEYS.TOKEN)) {
+            navigate('/dashboard');
+        }
+    }, [navigate]);
 
     const login = async () => {
-        if ((!data?.email || !data?.password)) {
+        if (!data?.email || !data?.password) {
             return error('Please Enter all required Fields');
         }
         try {
-            const response = await doPOST(ENDPOINTS.login, data)
-            navigate('/dashboard')
-            localStorage.setItem(STORAGE_KEYS.TOKEN, response?.data?.token)
-            localStorage.setItem('isLoggedIn', true)
-            setIsLoggedIn(true)
-            setUserData(response?.data?.user)
-            success("Login Successfull")
-            return
+            const response = await doPOST(ENDPOINTS.login, data);
+            localStorage.setItem(STORAGE_KEYS.TOKEN, response?.data?.token);
+            setUserData(response?.data?.user);
+            setIsLoggedIn(true);
+            success("Login Successful");
+            navigate('/dashboard');
         } catch (error) {
-
+            error("Login Failed");
         }
-    }
+    };
 
-    // useEffect(() => {
-    //     if (isLoggedIn) {
-    //         navigate('/dashboard')
-    //     }
-    // }, [])
     return (
         <section className="bg-light py-3 py-md-5">
             <div className="container">
@@ -51,8 +46,6 @@ function Login() {
                                             borderRadius: "50%",
                                             objectFit: "contain"
                                         }} />
-                                        {/* <img src={logo} width="100px"
-                style="border-radius: 50%; object-fit:contain; height: auto; width:150px;" /> */}
                                     </a>
                                 </div>
                                 <h2 className="fs-6 fw-normal text-center text-secondary mb-4">Sign in to your account</h2>
@@ -61,36 +54,28 @@ function Login() {
                                         <div className="form-floating mb-3">
                                             <input
                                                 value={data?.email}
-                                                onChange={(v) => {
-                                                    setData(prevData => ({
-                                                        ...prevData,
-                                                        email: v.target.value
-                                                    }))
-                                                }}
+                                                onChange={(v) => setData({ ...data, email: v.target.value })}
                                                 type="text"
                                                 className="form-control"
                                                 name="Email"
                                                 placeholder='Email'
-                                                required />
+                                                required
+                                            />
                                             <label className="form-label">Email</label>
                                         </div>
                                     </div>
                                     <div className="col-12">
                                         <div className="form-floating mb-3">
                                             <input
-                                                onChange={(v) => {
-                                                    setData(prevData => ({
-                                                        ...prevData,
-                                                        password: v.target.value
-                                                    }))
-                                                }}
+                                                value={data?.password}
+                                                onChange={(v) => setData({ ...data, password: v.target.value })}
                                                 type="password"
                                                 className="form-control"
                                                 name="password"
-                                                value={data?.password}
                                                 placeholder="Password"
-                                                required />
-                                            <label htmlFor="password" className="form-label">Password</label>
+                                                required
+                                            />
+                                            <label className="form-label">Password</label>
                                         </div>
                                     </div>
                                     <div className="col-12">
@@ -106,17 +91,18 @@ function Login() {
                                     </div>
                                     <div className="col-12">
                                         <div className="d-grid my-3">
-                                            <button onClick={(e) => {
-                                                e.preventDefault();
-                                                login();
-                                            }} className="btn btn-primary btn-lg" type="submit">Log in</button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    login();
+                                                }}
+                                                className="btn btn-primary btn-lg"
+                                                type="submit"
+                                            >
+                                                Log in
+                                            </button>
                                         </div>
                                     </div>
-                                    {/* <div className="col-12">
-                                        <p className="m-0 text-secondary text-center">Don't have an account? <span onClick={() => {
-                                            navigate("/signup")
-                                        }} className="link-primary text-decoration-none cursor-pointer">Sign up</span></p>
-                                    </div> */}
                                 </div>
                             </div>
                         </div>
@@ -125,6 +111,6 @@ function Login() {
             </div>
         </section>
     );
-}
+};
 
 export default Login;
