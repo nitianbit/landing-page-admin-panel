@@ -89,7 +89,7 @@ const EditProject = () => {
                 projectId = projectResponse._id;
                 setProject(projectResponse);
                 // Update the URL with the new project ID
-                navigate(`/projects/edit/${projectId}`);
+                navigate(`/admin/projects/edit/${projectId}`);
             }
             // Submit forms after project creation/update
             forms.forEach((form, index) => {

@@ -13,7 +13,7 @@ const Login = () => {
 
     useEffect(() => {
         if (localStorage.getItem(STORAGE_KEYS.TOKEN)) {
-            navigate('/dashboard');
+            navigate('/admin/dashboard');
         }
     }, [navigate]);
 
@@ -27,7 +27,7 @@ const Login = () => {
             setUserData(response?.data?.user);
             setIsLoggedIn(true);
             success("Login Successful");
-            navigate('/dashboard');
+            navigate('/admin/dashboard');
         } catch (error) {
             error("Login Failed");
         }
