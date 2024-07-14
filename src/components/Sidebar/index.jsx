@@ -1,7 +1,7 @@
 import React from 'react';
 import { MdDashboard } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
+import { MdLeaderboard } from "react-icons/md";
 import './style.css'
 import { Link } from 'react-router-dom';
 
@@ -23,7 +23,7 @@ function Sidebar() {
                         <FaUser className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Projects</span>
                     </Link>
                     <Link to="/admin/leads" className="nav-link align-middle px-0">
-                        <FaUser className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Leads</span>
+                        <MdLeaderboard className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Leads</span>
                     </Link>
                 </ul>
                 <hr />
