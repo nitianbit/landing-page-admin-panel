@@ -3,7 +3,7 @@ import Leads from '../pages/Leads';
 
 export const authRoutes = [
     {
-        path: "/admin/login",
+        path: "/",
         element: <Login />,
 
     },
@@ -14,33 +14,33 @@ export const openRoutes = [];
 
 export const protectedRoutes = [
     {
-        path: "/admin/dashboard",
+        path: "/dashboard",
         element: <Dashboard />,
     },
     {
-        path: "/admin/users",
+        path: "/users",
         element: <Users />
     },
     {
-        path: "/admin/fields",
+        path: "/fields",
         element: <Field />
     },
     {
-        path: "/admin/projects",
+        path: "/projects",
         element: <Projects />
     }
     ,
     {
-        path: "/admin/leads",
+        path: "/leads",
         element: <Leads />
     }
     ,
     {
-        path: "/admin/projects/create",
+        path: "/projects/create",
         element: <EditProject />
     },
     {
-        path: "/admin/projects/edit/:id",
+        path: "/projects/edit/:id",
         element: <EditProject />
     }
 ]

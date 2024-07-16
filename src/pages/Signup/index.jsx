@@ -18,7 +18,7 @@ const Signup = () => {
         }
         try {
             const response = await doPOST(ENDPOINTS.register, data)
-            navigate("/admin/login")
+            navigate("/login")
             success("Signup Successfull")
             return
         } catch (error) {
@@ -110,7 +110,7 @@ const Signup = () => {
                                             </div>
                                         </div>
                                         <div className="col-12">
-                                            <p className="m-0 text-secondary text-center">Already have an account? <a onClick={() => navigate("/admin/login")} className="link-primary text-decoration-none cursor-pointer">Sign in</a></p>
+                                            <p className="m-0 text-secondary text-center">Already have an account? <a onClick={() => navigate("/login")} className="link-primary text-decoration-none cursor-pointer">Sign in</a></p>
                                         </div>
                                     </div>
                                 </form>

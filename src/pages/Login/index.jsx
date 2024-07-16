@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/images/logo.png'
+import logo from '../../assets/images/logo.svg'
 import { AppContext } from '../../services/context/AppContext';
 import { doPOST } from '../../utils/HttpUtil';
 import { STORAGE_KEYS } from '../../services/Storage';
@@ -13,7 +13,7 @@ const Login = () => {
 
     useEffect(() => {
         if (localStorage.getItem(STORAGE_KEYS.TOKEN)) {
-            navigate('/admin/dashboard');
+            navigate('/fields');
         }
     }, [navigate]);
 
@@ -27,7 +27,7 @@ const Login = () => {
             setUserData(response?.data?.user);
             setIsLoggedIn(true);
             success("Login Successful");
-            navigate('/admin/dashboard');
+            navigate('/fields');
         } catch (error) {
             error("Login Failed");
         }
@@ -78,7 +78,7 @@ const Login = () => {
                                             <label className="form-label">Password</label>
                                         </div>
                                     </div>
-                                    <div className="col-12">
+                                    {/* <div className="col-12">
                                         <div className="d-flex gap-2 justify-content-between">
                                             <div className="form-check">
                                                 <input className="form-check-input" type="checkbox" value="" name="rememberMe" id="rememberMe" />
@@ -88,7 +88,7 @@ const Login = () => {
                                             </div>
                                             <a href="#!" className="link-primary text-decoration-none">Forgot password?</a>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="col-12">
                                         <div className="d-grid my-3">
                                             <button
