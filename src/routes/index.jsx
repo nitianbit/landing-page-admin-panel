@@ -45,7 +45,7 @@ export const protectedRoutes = [
         element: <EditProject />
     },
     {
-        path: "/projects/edit/:id",
+        path: "/projects/edit/:projectId",
         element: <EditProject />
     }
 ]

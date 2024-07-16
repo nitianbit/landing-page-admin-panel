@@ -8,7 +8,7 @@ import { Card } from 'reactstrap';
 import { AppContext } from '../../services/context/AppContext';
 
 const EditProject = () => {
-    const { id } = useParams();
+    const { projectId } = useParams();
     const navigate = useNavigate();
     const { success, error } = useContext(AppContext);
     const [project, setProject] = useState({
@@ -19,30 +19,31 @@ const EditProject = () => {
     const [fields, setFields] = useState([]);
 
     useEffect(() => {
-        if (id) {
+        if (projectId) {
             const fetchProject = async () => {
                 try {
-                    const response = await doGET(ENDPOINTS.getProjectById(id));
+                    const response = await doGET(ENDPOINTS.getProjectById(projectId));
                     setProject(response);
 
-                    const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(id));
+                    const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(projectId));
                     setForms(formsResponse);
                 } catch (error) {
                     console.error("Failed to fetch project", error);
                 }
             };
+            const fetchFields = async () => {
+                try {
+                    const response = await doGET(FieldENDPOINTS.getFields);
+                    setFields(response);
+                } catch (error) {
+                    console.error("Failed to fetch fields", error);
+                }
+            };
+            fetchFields();
             fetchProject();
         }
-        const fetchFields = async () => {
-            try {
-                const response = await doGET(FieldENDPOINTS.getFields);
-                setFields(response);
-            } catch (error) {
-                console.error("Failed to fetch fields", error);
-            }
-        };
-        fetchFields();
-    }, [id]);
+
+    }, [projectId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -83,21 +84,24 @@ const EditProject = () => {
     const handleProjectSubmit = async (e) => {
         e.preventDefault();
         try {
-            let projectId = id;
-            if (projectId) {
-                await doPUT(ENDPOINTS.updateProject(projectId), project);
+            let id = projectId;
+            if (!project?.name || !project?.domain) {
+                return error('Please Enter all required Fields');
+            }
+            if (id) {
+                await doPUT(ENDPOINTS.updateProject(id), project);
             } else {
                 const projectResponse = await doPOST(ENDPOINTS.addProject, project);
-                projectId = projectResponse._id;
+                id = projectResponse._id;
                 setProject(projectResponse);
                 // Update the URL with the new project ID
-                navigate(`/projects/edit/${projectId}`);
+                navigate(`/projects/edit/${id}`);
             }
             // Submit forms after project creation/update
             // forms.forEach((form, index) => {
             //     handleFormSubmit(index, projectId);
             // });
-            success(projectId ? "Project updated" : "Project created");
+            success(id ? "Project updated" : "Project created");
 
         } catch (error) {
             console.error("Failed to save project", error);
@@ -105,14 +109,17 @@ const EditProject = () => {
         }
     };
 
-    const handleFormSubmit = async (formIndex, projectId) => {
+    const handleFormSubmit = async (formIndex, projectIdInput) => {
         try {
             const form = forms[formIndex];
             const fields = form.fields.map(field => field?._id);
+            if (!form?.title) {
+                return error('Please Enter Form title');
+            }
             if (form._id) {
-                await doPUT(FORMENDPOINTS.updateForm(form._id), { ...form, fields, project: projectId });
+                await doPUT(FORMENDPOINTS.updateForm(form._id), { ...form, fields, project: projectIdInput });
             } else {
-                await doPOST(FORMENDPOINTS.addForm, { ...form, fields, project: projectId });
+                await doPOST(FORMENDPOINTS.addForm, { ...form, fields, project: projectIdInput });
             }
             success(form?._id ? "Form updated" : "Form created");
         } catch (error) {
@@ -125,7 +132,7 @@ const EditProject = () => {
         <div className='container'>
             <Card onSubmit={handleProjectSubmit} className='mt-3 p-2 px-3'>
                 <div className="mb-3">
-                    <label className='mb-1'>Project Name</label>
+                    <label className='mb-1 required'>Project Name</label>
                     <input
                         type="text"
                         name="name"
@@ -147,7 +154,7 @@ const EditProject = () => {
                     />
                 </div>
                 <div className="mb-3">
-                    <label className='mb-1'>Enter Domain</label>
+                    <label className='mb-1 required'>Enter Domain</label>
                     <input
                         type="text"
                         name="domain"
@@ -159,8 +166,8 @@ const EditProject = () => {
                 </div>
                 <button onClick={handleProjectSubmit} className="btn btn-outline-success" style={{
                     position: "relative",
-                    width: "120px"
-                }}>Save Project</button>
+                    width: projectId ? "140px" : "120px"
+                }}>{projectId ? "Update" : "Save"} Project</button>
             </Card>
 
             {project?._id && (
@@ -171,7 +178,7 @@ const EditProject = () => {
                             <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, project._id); }}>
                                 <div className='d-flex align-items-end my-2'>
                                     <div>
-                                        <label className='mb-1'>Form Title</label>
+                                        <label className='mb-1 required'>Form Title</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -214,7 +221,7 @@ const EditProject = () => {
                                         </label>
                                     </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary">Save Form</button>
+                                <button type="submit" className="btn btn-primary">{form?._id ? "Update" : "Save"} Form</button>
                             </form>
                         </Card>
                     ))}
