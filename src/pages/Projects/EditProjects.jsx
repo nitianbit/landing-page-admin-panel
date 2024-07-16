@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { doGET, doPOST, doPUT } from '../../utils/HttpUtil';
 import { ENDPOINTS } from './Constant';
 import { FORMENDPOINTS } from '../FormPage/Constant';
 import { FieldENDPOINTS } from '../FieldPage/Constant';
 import { Card } from 'reactstrap';
+import { AppContext } from '../../services/context/AppContext';
 
 const EditProject = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { success, error } = useContext(AppContext);
     const [project, setProject] = useState({
         name: '',
         description: ''
@@ -92,11 +94,14 @@ const EditProject = () => {
                 navigate(`/projects/edit/${projectId}`);
             }
             // Submit forms after project creation/update
-            forms.forEach((form, index) => {
-                handleFormSubmit(index, projectId);
-            });
+            // forms.forEach((form, index) => {
+            //     handleFormSubmit(index, projectId);
+            // });
+            success(projectId ? "Project updated" : "Project created");
+
         } catch (error) {
             console.error("Failed to save project", error);
+            error(error)
         }
     };
 
@@ -109,24 +114,12 @@ const EditProject = () => {
             } else {
                 await doPOST(FORMENDPOINTS.addForm, { ...form, fields, project: projectId });
             }
+            success(form?._id ? "Form updated" : "Form created");
         } catch (error) {
             console.error("Failed to save form", error);
+            error(error)
         }
     };
-
-    // const handleFormSubmit = async (formIndex, projectId) => {
-    //     try {
-    //         const form = forms[formIndex];
-    //         const formattedFields = form.fields.map(field => ({ fieldId: field.fieldId }));
-    //         if (form._id) {
-    //             await doPUT(FORMENDPOINTS?.updateForm(form._id), { ...form, fields: formattedFields, project: projectId });
-    //         } else {
-    //             await doPOST(FORMENDPOINTS.addForm, { ...form, fields: formattedFields, project: projectId });
-    //         }
-    //     } catch (error) {
-    //         console.error("Failed to save form", error);
-    //     }
-    // };
 
     return (
         <div className='container'>

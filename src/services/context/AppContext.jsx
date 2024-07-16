@@ -17,7 +17,7 @@ export const AppProvider = ({ children }) => {
     const getCurrentUser = async () => {
         try {
             const response = await doGET(ENDPOINTS?.profile);
-            setUserData(response);
+            setUserData(response?.data);
             if (response) {
                 setIsLoggedIn(true)
             }

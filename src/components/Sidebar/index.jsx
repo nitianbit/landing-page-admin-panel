@@ -17,13 +17,13 @@ function Sidebar() {
                     {/* <Link to="/dashboard" className="nav-link px-0 align-middle  text-grey">
                         <MdDashboard className='text-grey' /> <span className="ms-1 d-none d-sm-inline text-grey">Dashboard</span>
                     </Link> */}
-                    <Link to="/fields" className={`nav-link align-middle bg-${location.pathname.includes("fields") ? "light" : "white"} w-100 px-3`}>
+                    <Link to="/fields" className={`nav-link align-middle bg-${location.pathname.includes("fields") ? "light" : "white"} w-100 px-3 cursor-pointer`}>
                         <FaUser className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Fields</span>
                     </Link>
-                    <Link to="/projects" className={`nav-link align-middle bg-${location.pathname.includes("projects") ? "light" : "white"} w-100 px-3`}>
+                    <Link to="/projects" className={`nav-link align-middle bg-${location.pathname.includes("projects") ? "light" : "white"} w-100 px-3 cursor-pointer`}>
                         <FaUser className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Projects</span>
                     </Link>
-                    <Link to="/leads" className={`nav-link align-middle bg-${location.pathname.includes("leads") ? "light" : "white"} w-100 px-3`}>
+                    <Link to="/leads" className={`nav-link align-middle bg-${location.pathname.includes("leads") ? "light" : "white"} w-100 px-3 cursor-pointer`}>
                         <MdLeaderboard className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Leads</span>
                     </Link>
                 </ul>

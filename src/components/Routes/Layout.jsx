@@ -13,7 +13,7 @@ const Layout = () => {
     return isLoggedIn ? (
         <div className='d-flex'>
             <SideBar />
-            <div className="flex-1">
+            <div className="flex-1 bg-light">
                 <Navbar />
                 <div className='bg-light p-3'>
                     <Outlet />
