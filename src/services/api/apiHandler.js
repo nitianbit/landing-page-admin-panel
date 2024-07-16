@@ -3,8 +3,8 @@ import { STORAGE_KEYS, getValue } from "../Storage";
 import { API_METHODS } from "./constants";
 
 const api = axios.create({
-    baseURL: 'http://localhost:5400/api',
-    //   baseURL: "https://api.apkiproperty.com/api",
+    // baseURL: 'http://localhost:5400/api',
+    baseURL: "https://api.apkiproperty.com/api",
     timeout: 10000,
 });
 
