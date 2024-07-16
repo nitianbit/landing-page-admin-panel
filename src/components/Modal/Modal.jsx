@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { RxCross2 } from "react-icons/rx";
 
-const Modal = ({ header, content, onSave, onClose, isOpen }) => {
+const Modal = ({ header, content, onSave, onClose, isOpen, okText = "Save", cancelText = "Cancel" }) => {
     return (
         <div>
             {/* Modal */}
@@ -16,8 +16,8 @@ const Modal = ({ header, content, onSave, onClose, isOpen }) => {
                             {content}
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={onClose}>Close</button>
-                            <button onClick={onSave} type="button" className="btn btn-primary">Save</button>
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>{cancelText}</button>
+                            <button onClick={onSave} type="button" className="btn btn-primary">{okText}</button>
                         </div>
                     </div>
                 </div>
