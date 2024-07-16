@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/images/logo.svg'
+import { logo } from '../../assets/index'
 import { AppContext } from '../../services/context/AppContext';
 import { doPOST } from '../../utils/HttpUtil';
 import { STORAGE_KEYS } from '../../services/Storage';
@@ -61,7 +61,7 @@ const Login = () => {
                                                 placeholder='Email'
                                                 required
                                             />
-                                            <label className="form-label">Email</label>
+                                            <label className="form-label required">Email</label>
                                         </div>
                                     </div>
                                     <div className="col-12">
@@ -75,7 +75,7 @@ const Login = () => {
                                                 placeholder="Password"
                                                 required
                                             />
-                                            <label className="form-label">Password</label>
+                                            <label className="form-label required">Password</label>
                                         </div>
                                     </div>
                                     {/* <div className="col-12">
@@ -102,6 +102,9 @@ const Login = () => {
                                                 Log in
                                             </button>
                                         </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <p className="m-0 text-secondary text-center">Didn't have an account? <a onClick={() => navigate("/register")} className="link-primary text-decoration-none cursor-pointer">Register</a></p>
                                     </div>
                                 </div>
                             </div>

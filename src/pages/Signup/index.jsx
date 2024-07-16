@@ -1,6 +1,6 @@
 import React, { useContext, useNa, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/images/logo.png'
+import { logo } from '../../assets/index'
 import { AppContext } from '../../services/context/AppContext';
 import { ENDPOINTS } from '../../services/api/constants';
 import { doPOST } from '../../utils/HttpUtil';
@@ -54,7 +54,7 @@ const Signup = () => {
                                                         }))
                                                     }}
                                                     type="text" className="form-control" name="name" id="name" placeholder="Name" required />
-                                                <label htmlFor="name" className="form-label">Name</label>
+                                                <label htmlFor="name" className="form-label required">Name</label>
                                             </div>
                                         </div>
                                         <div className="col-12">
@@ -68,7 +68,7 @@ const Signup = () => {
                                                         }))
                                                     }}
                                                     type="text" className="form-control" name="email" placeholder="Email" required />
-                                                <label htmlFor="email" className="form-label">email</label>
+                                                <label htmlFor="email" className="form-label required">Email</label>
                                             </div>
                                         </div>
                                         <div className="col-12">
@@ -82,7 +82,7 @@ const Signup = () => {
                                                         }))
                                                     }}
                                                     type="password" className="form-control" name="password" id="password" placeholder="Password" required />
-                                                <label htmlFor="password" className="form-label">Password</label>
+                                                <label htmlFor="password" className="form-label required">Password</label>
                                             </div>
                                         </div>
                                         <div className="col-12">
@@ -96,7 +96,7 @@ const Signup = () => {
                                                         }))
                                                     }}
                                                     type="text" className="form-control" name="companyName" id="companyName" placeholder="Company Name" required={true} />
-                                                <label htmlFor="companyName" className="form-label">Company Name</label>
+                                                <label htmlFor="companyName" className="form-label required">Company Name</label>
                                             </div>
                                         </div>
                                         <div className="col-12">
@@ -110,7 +110,7 @@ const Signup = () => {
                                                         }))
                                                     }}
                                                     type="text" className="form-control" name="websiteURL" id="websiteURL" placeholder="Website URL" required />
-                                                <label htmlFor="websiteURL" className="form-label">Website URL</label>
+                                                <label htmlFor="websiteURL" className="form-label required">Website URL</label>
                                             </div>
                                         </div>
                                         {/* <div className="col-12">
