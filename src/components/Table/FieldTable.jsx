@@ -25,6 +25,9 @@ const FieldTable = ({ tableData, getAllFields }) => {
     const handleUpdateData = async () => {
         try {
             setLoading(true)
+            if (!editState?.selectedField?.label || !editState?.selectedField?.type) {
+                return error('Please Enter all required Fields');
+            }
             if (!editState.selectedField?._id) {
                 await doPOST(FieldENDPOINTS.addField, editState.selectedField)
             } else {

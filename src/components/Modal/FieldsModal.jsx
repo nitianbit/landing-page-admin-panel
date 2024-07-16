@@ -32,7 +32,7 @@ const EditFieldContent = ({ userData, setUserData }) => {
     return (
         <div>
             <div className="mb-3">
-                <label className="mb-1">Label</label>
+                <label className="mb-1 required">Label</label>
                 <input
                     type="text"
                     className="form-control"
@@ -44,7 +44,7 @@ const EditFieldContent = ({ userData, setUserData }) => {
                 />
             </div>
             <div className="mb-3">
-                <label className="mb-1">Type</label>
+                <label className="mb-1 required">Type</label>
                 <select
                     className="form-select"
                     value={userData?.type}
