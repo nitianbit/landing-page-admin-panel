@@ -13,12 +13,12 @@ const Signup = () => {
     const [data, setData] = useState({})
 
     const signUp = async () => {
-        if ((!data?.name || !data?.phone || !data?.password)) {
+        if ((!data?.name || !data?.email || !data?.password || !companyName || !websiteURL)) {
             return error('Please Enter all required Fields');
         }
         try {
             const response = await doPOST(ENDPOINTS.register, data)
-            navigate("/login")
+            navigate("/")
             success("Signup Successfull")
             return
         } catch (error) {
@@ -57,24 +57,18 @@ const Signup = () => {
                                                 <label htmlFor="name" className="form-label">Name</label>
                                             </div>
                                         </div>
-                                        {/* <div className="col-12">
-                                            <div className="form-floating mb-3">
-                                                <input type="text" className="form-control" name="lastName" id="lastName" placeholder="Last Name" required />
-                                                <label htmlFor="lastName" className="form-label">Last Name</label>
-                                            </div>
-                                        </div> */}
                                         <div className="col-12">
                                             <div className="form-floating mb-3">
                                                 <input
-                                                    value={data?.phone}
+                                                    value={data?.email}
                                                     onChange={(v) => {
                                                         setData(prevData => ({
                                                             ...prevData,
-                                                            phone: v.target.value
+                                                            email: v.target.value
                                                         }))
                                                     }}
-                                                    type="number" className="form-control" name="phone" placeholder="Phone" required />
-                                                <label htmlFor="phone" className="form-label">Phone</label>
+                                                    type="text" className="form-control" name="email" placeholder="Email" required />
+                                                <label htmlFor="email" className="form-label">email</label>
                                             </div>
                                         </div>
                                         <div className="col-12">
@@ -92,13 +86,41 @@ const Signup = () => {
                                             </div>
                                         </div>
                                         <div className="col-12">
+                                            <div className="form-floating mb-3">
+                                                <input
+                                                    value={data?.companyName}
+                                                    onChange={(v) => {
+                                                        setData(prevData => ({
+                                                            ...prevData,
+                                                            companyName: v.target.value
+                                                        }))
+                                                    }}
+                                                    type="text" className="form-control" name="companyName" id="companyName" placeholder="Company Name" required={true} />
+                                                <label htmlFor="companyName" className="form-label">Company Name</label>
+                                            </div>
+                                        </div>
+                                        <div className="col-12">
+                                            <div className="form-floating mb-3">
+                                                <input
+                                                    value={data?.websiteURL}
+                                                    onChange={(v) => {
+                                                        setData(prevData => ({
+                                                            ...prevData,
+                                                            websiteURL: v.target.value
+                                                        }))
+                                                    }}
+                                                    type="text" className="form-control" name="websiteURL" id="websiteURL" placeholder="Website URL" required />
+                                                <label htmlFor="websiteURL" className="form-label">Website URL</label>
+                                            </div>
+                                        </div>
+                                        {/* <div className="col-12">
                                             <div className="form-check">
                                                 <input className="form-check-input" type="checkbox" name="iAgree" id="iAgree" required />
                                                 <label className="form-check-label text-secondary" htmlFor="iAgree">
                                                     I agree to the <a href="#!" className="link-primary text-decoration-none">terms and conditions</a>
                                                 </label>
                                             </div>
-                                        </div>
+                                        </div> */}
                                         <div className="col-12">
                                             <div className="d-grid my-3">
                                                 <button
@@ -110,7 +132,7 @@ const Signup = () => {
                                             </div>
                                         </div>
                                         <div className="col-12">
-                                            <p className="m-0 text-secondary text-center">Already have an account? <a onClick={() => navigate("/login")} className="link-primary text-decoration-none cursor-pointer">Sign in</a></p>
+                                            <p className="m-0 text-secondary text-center">Already have an account? <a onClick={() => navigate("/")} className="link-primary text-decoration-none cursor-pointer">Login</a></p>
                                         </div>
                                     </div>
                                 </form>

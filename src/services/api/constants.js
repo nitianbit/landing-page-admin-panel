@@ -10,6 +10,6 @@ export const API_METHODS = {
 
 export const ENDPOINTS = {
     login: '/login',
-    register: '/signup',
+    register: '/register',
     profile: '/profile',
 }
