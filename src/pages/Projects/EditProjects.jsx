@@ -13,7 +13,8 @@ const EditProject = () => {
     const { success, error } = useContext(AppContext);
     const [project, setProject] = useState({
         name: '',
-        description: ''
+        description: '',
+        domain: ''
     });
     const [forms, setForms] = useState([]);
     const [fields, setFields] = useState([]);
@@ -71,7 +72,7 @@ const EditProject = () => {
 
     const addFieldToForm = (formIndex) => {
         const updatedForms = [...forms];
-        updatedForms[formIndex].fields.push({ _id: fields.length ? fields[0]._id : '' });
+        updatedForms[formIndex].fields.push({ _id: fields.length ? fields[0]._id : '', required: false });
         setForms(updatedForms);
     };
 
@@ -86,7 +87,7 @@ const EditProject = () => {
         try {
             let id = projectId;
             if (!project?.name || !project?.domain) {
-                return error('Please Enter all required Fields');
+                return error('Please enter all required fields');
             }
             if (id) {
                 await doPUT(ENDPOINTS.updateProject(id), project);
@@ -97,10 +98,6 @@ const EditProject = () => {
                 // Update the URL with the new project ID
                 navigate(`/projects/edit/${id}`);
             }
-            // Submit forms after project creation/update
-            // forms.forEach((form, index) => {
-            //     handleFormSubmit(index, projectId);
-            // });
             success(id ? "Project updated" : "Project created");
 
         } catch (error) {
@@ -112,9 +109,9 @@ const EditProject = () => {
     const handleFormSubmit = async (formIndex, projectIdInput) => {
         try {
             const form = forms[formIndex];
-            const fields = form.fields.map(field => field?._id);
+            const fields = form.fields.map(field => ({ _id: field?._id, required: field?.required }));
             if (!form?.title) {
-                return error('Please Enter Form title');
+                return error('Please enter form title');
             }
             if (form._id) {
                 await doPUT(FORMENDPOINTS.updateForm(form._id), { ...form, fields, project: projectIdInput });
@@ -172,7 +169,7 @@ const EditProject = () => {
 
             {project?._id && (
                 <div className='mt-3'>
-                    <button type="button" className="btn btn-primary ms-1 mb-2" onClick={addForm}>Add Form</button>
+                    {/* <button type="button" className="btn btn-primary ms-1 mb-2" onClick={addForm}>Add Form</button> */}
                     {forms?.map((form, formIndex) => (
                         <Card key={formIndex} className="mb-3 px-4 py-2">
                             <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, project._id); }}>
@@ -201,6 +198,17 @@ const EditProject = () => {
                                                 <option key={f?._id} value={f?._id}>{f?.label}</option>
                                             ))}
                                         </select>
+                                        <div className="form-check m-2">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                checked={field?.required || false}
+                                                onChange={(e) => handleFieldChange(formIndex, fieldIndex, 'required', e.target.checked)}
+                                            />
+                                            <label className="form-check-label">
+                                                Is Required
+                                            </label>
+                                        </div>
                                         <button
                                             type="button"
                                             className="btn btn-danger"
@@ -212,11 +220,11 @@ const EditProject = () => {
                                 ))}
                                 <div>
                                     <div className="form-check m-2">
-                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckIndeterminate"
+                                        <input className="form-check-input" type="checkbox" value="" id="flexCheckIndeterminate"
                                             checked={form?.showOTP}
                                             onChange={(e) => handleFormChange(formIndex, 'showOTP', e.target.checked)}
                                         />
-                                        <label class="form-check-label" for="flexCheckIndeterminate">
+                                        <label className="form-check-label" htmlFor="flexCheckIndeterminate">
                                             Show OTP
                                         </label>
                                     </div>
