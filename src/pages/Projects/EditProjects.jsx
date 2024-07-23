@@ -65,6 +65,23 @@ const EditProject = () => {
         setForms(updatedForms);
     };
 
+    const handleRequiredFields = (formIndex, fieldId) => {
+        const updatedForms = forms.map((form, index) => {
+
+            if (index == formIndex) {
+                let requiredFieldsArray = form?.requiredFields ?? [];
+
+                const foundIndex = requiredFieldsArray.findIndex(requiredField => requiredField == fieldId);
+                if (foundIndex != -1) {
+                    requiredFieldsArray.splice(foundIndex, 1);
+                } else requiredFieldsArray.push(fieldId);
+                return { ...form, requiredFields: requiredFieldsArray }
+            }
+            return form
+        })
+        setForms(updatedForms)
+    }
+
     const addForm = () => {
         setForms([...forms, { title: '', fields: [], project: project?._id }]);
     };
@@ -201,6 +218,17 @@ const EditProject = () => {
                                                 <option key={f?._id} value={f?._id}>{f?.label}</option>
                                             ))}
                                         </select>
+                                        <div className="form-check m-2">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                checked={form?.requiredFields?.includes(field?._id) || false}
+                                                onChange={(e) => handleRequiredFields(formIndex, field?._id)}
+                                            />
+                                            <label className="form-check-label">
+                                                Is Required
+                                            </label>
+                                        </div>
                                         <button
                                             type="button"
                                             className="btn btn-danger"
