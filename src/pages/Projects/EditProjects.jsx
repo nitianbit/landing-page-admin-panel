@@ -111,7 +111,6 @@ const EditProject = () => {
                 const projectResponse = await doPOST(ENDPOINTS.addProject, project);
                 id = projectResponse._id;
                 setProject(projectResponse);
-                // Update the URL with the new project ID
                 navigate(`/projects/edit/${id}`);
             }
             // Submit forms after project creation/update
@@ -189,7 +188,7 @@ const EditProject = () => {
 
             {project?._id && (
                 <div className='mt-3'>
-                    <button type="button" className="btn btn-primary ms-1 mb-2" onClick={addForm}>Add Form</button>
+                    {/* <button type="button" className="btn btn-primary ms-1 mb-2" onClick={addForm}>Add Form</button> */}
                     {forms?.map((form, formIndex) => (
                         <Card key={formIndex} className="mb-3 px-4 py-2">
                             <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, project._id); }}>

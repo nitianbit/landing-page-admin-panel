@@ -1,15 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { MdEdit, MdDelete } from "react-icons/md";
-import { BsFillEyeFill } from "react-icons/bs";
-import { BsFillEyeSlashFill } from "react-icons/bs";
 import Modal from '../Modal/Modal';
-import EditUserContent from '../Modal/EditUserContent';
 import { ENDPOINTS } from '../../pages/Projects/Constant';
 import { doDELETE, doPOST, doPUT } from '../../utils/HttpUtil';
 import { AppContext } from '../../services/context/AppContext';
-import EditFieldContent from '../Modal/FieldsModal';
 import { useNavigate } from 'react-router-dom';
-import { EditProject } from '../../pages';
 
 const ProjectTable = ({ tableData, getAllProjects }) => {
 
@@ -151,7 +146,6 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
                 </div>
 
             </div>
-            {/* {editState?.isModalOpen && <EditProject />} */}
             {deleteProjectId && <Modal
                 header="Delete Project"
                 onSave={deleteProject}
