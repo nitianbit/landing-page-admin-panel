@@ -26,7 +26,7 @@ const apiHandler = async (endPoint, method, data = null) => {
         if (error?.response?.status == 401) {
                  localStorage.clear()
                  window.location.pathname = "/"
-             } */
+        }
         if (error.response) {
             console.error("Response Error:", error.response.data);
             throw new Error(error.response.data.message || "Something went wrong");
