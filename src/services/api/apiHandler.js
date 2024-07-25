@@ -23,7 +23,7 @@ const apiHandler = async (endPoint, method, data = null) => {
         return response.data;
     } catch (error) {
         //handle 401 here
-        /*  if (error?.response?.status == 401) {
+        if (error?.response?.status == 401) {
                  localStorage.clear()
                  window.location.pathname = "/"
              } */
