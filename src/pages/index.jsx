@@ -5,6 +5,8 @@ import Users from "./Users/Users";
 import Field from './FieldPage/index'
 import Projects from "./Projects";
 import EditProject from "./Projects/EditProjects";
+import Products from "./Products";
+import EditProduct from "./Products/EditProduct";
 
 export {
     Login,
@@ -14,4 +16,6 @@ export {
     Field,
     Projects,
     EditProject,
+    Products,
+    EditProduct
 }

@@ -26,6 +26,9 @@ function Sidebar() {
                     <Link to="/leads" className={`nav-link align-middle bg-${location.pathname.includes("leads") ? "light" : "white"} w-100 px-3 cursor-pointer`}>
                         <MdLeaderboard className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Leads</span>
                     </Link>
+                    <Link to="/products" className={`nav-link align-middle bg-${location.pathname.includes("products") ? "light" : "white"} w-100 px-3 cursor-pointer`}>
+                        <MdLeaderboard className='text-grey' /><i className="fs-4 bi-house"></i> <span className="ms-1 d-none d-sm-inline text-grey">Products</span>
+                    </Link>
                 </ul>
                 <hr />
             </div>

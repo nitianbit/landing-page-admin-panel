@@ -13,6 +13,16 @@ const Leads = () => {
         formId: null,
         projectId: null
     });
+    const [products, setProducts] = useState([]);
+
+    const getProductByProject = async (projectId) => {
+        try {
+            const response = await doGET(ENDPOINTS.getProductsByProject(projectId));
+            setProducts(response)
+        } catch (error) {
+
+        }
+    }
 
     const getProjects = async () => {
         try {
@@ -23,20 +33,21 @@ const Leads = () => {
                     ...prev,
                     projectId: response[0]?._id || null
                 }));
+                getProductByProject(response[0]?._id)
             }
         } catch (error) {
             console.error("Error fetching projects: ", error);
         }
     };
 
-    const getProjectFormLeads = async () => {
+    const getProjectFormLeads = async (refererId) => {
         try {
-            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId));
+            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId));
             if (response) {
                 // setProjects(response);
                 setProjectFormValue((prev) => ({
                     ...prev,
-                    data: response
+                    data: response?.filter((lead) => lead?.refererId === refererId)
                 }));
                 // setProjectFormValue(response?.values)
             }
@@ -45,7 +56,7 @@ const Leads = () => {
         }
     };
 
-    const getFormByProjectId = async (req, res) => {
+    const getFormByProjectId = async () => {
         try {
             const response = await doGET(ENDPOINTS.getFormByProjectId(projectFormValue.projectId));
             if (response) {
@@ -85,13 +96,17 @@ const Leads = () => {
     }, [projectFormValue.projectId]);
 
     useEffect(() => {
-        if (projectFormValue.projectId && projectFormValue.formId) {
+
+        if (projectFormValue.projectId && projectFormValue.formId && !projectFormValue.refererId) {
             getProjectFormLeads();
+        }
+        if (projectFormValue.refererId) {
+            getProjectFormLeads(projectFormValue.refererId);
         }
         if (projectFormValue?.formId) {
             filterFormHeaders();
         }
-    }, [projectFormValue.formId, projectFormValue.projectId]);
+    }, [projectFormValue.formId, projectFormValue.projectId, projectFormValue.refererId]);
 
     return (
         <div className='w-100'>
@@ -113,6 +128,38 @@ const Leads = () => {
                         </select>
                     </div>
                 )}
+
+                <div className="m-3">
+                    <label className='mb-1'>Products</label>
+                    <select
+                        className="form-select"
+                        value={projectFormValue?.refererId}
+                        onChange={(e) => {
+                            setProjectFormValue((prev) => ({ ...prev, refererId: e.target.value }));
+                            // getProjectFormLeads(e.target.value);
+                            // getFormByProjectId(e.target.value);
+                            const product = products?.find((product) => product?._id === e.target.value)
+                            if (!product) {
+                                getFormByProjectId()
+                            }
+                            if (product?.forms) {
+                                setFormsByProject(product?.forms);
+                                setProjectFormValue((prev) => ({
+                                    ...prev,
+                                    formId: product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null
+                                }));
+                            }
+                        }}
+                    >
+                        <option selected value="">Front Page</option>
+                        {products?.map((item) => (
+                            <option key={item?._id} value={item?._id}>
+                                {item?.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 {formsByProject && (
                     <div className="m-3">
                         <label className='mb-1'>Forms</label>

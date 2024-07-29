@@ -1,11 +1,11 @@
 export const ENDPOINTS = {
     // addLead: `addProject`,
     getProjects: 'getProjects',
-    getProjectFormValue: (projectId, formId) => `/getFormValues/${projectId}/${formId}`,
 
     getFormByProjectId: (id) => `/project/${id}/Forms`,
+    getProductsByProject: (id) => `/getProductsByProject/${id}`,
 
-    getProjectFormLead: (projectId, formId) => `/getFormValues/${projectId}/${formId}`,
+    getProjectFormLead: (projectId, formId, refererId) => `/getFormValues/${projectId}/${formId}${refererId ? `?refererId=${refererId}` : ''}`,
 
     getProjectById: (id) => `/project/${id}`,
 

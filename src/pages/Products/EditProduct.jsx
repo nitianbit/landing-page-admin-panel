@@ -1,34 +1,50 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { doGET, doPOST, doPUT } from '../../utils/HttpUtil';
+import { doDELETE, doGET, doPOST, doPUT } from '../../utils/HttpUtil';
 import { ENDPOINTS } from './Constant';
 import { FORMENDPOINTS } from '../FormPage/Constant';
 import { FieldENDPOINTS } from '../FieldPage/Constant';
 import { Card } from 'reactstrap';
 import { AppContext } from '../../services/context/AppContext';
 
-const EditProject = () => {
-    const { projectId } = useParams();
+const EditProduct = () => {
+    const { productId, projectId } = useParams();
     const navigate = useNavigate();
     const { success, error } = useContext(AppContext);
-    const [project, setProject] = useState({
+    const [product, setProduct] = useState({
         name: '',
         description: ''
     });
     const [forms, setForms] = useState([]);
     const [fields, setFields] = useState([]);
+    const [parentForms, setParentForms] = useState([]);
+
+    const fetchProduct = async () => {
+        try {
+            const response = await doGET(ENDPOINTS.getProductById(productId));
+            setProduct({...response,product});
+            if (response?.parent) {
+                const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(response?.parent));
+                setParentForms(formsResponse?.map(form => ({ ...form, parent: true })));
+                const productForms = await doGET(FORMENDPOINTS.getFormByProjectId(productId));
+                setForms([...formsResponse?.map(form => ({ ...form, parent: true })), ...productForms]);
+            }
+
+        } catch (error) {
+            console.error("Failed to fetch product", error);
+        }
+    };
 
     useEffect(() => {
-        if (projectId) {
-            const fetchProject = async () => {
-                try {
-                    const response = await doGET(ENDPOINTS.getProjectById(projectId));
-                    setProject(response);
+        if (productId) {
 
-                    const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(projectId));
-                    setForms(formsResponse);
+            const fetchProjectForms = async () => {
+                try {
+                    const response = await doGET(ENDPOINTS.getFormByProjectId(productId));
+                    setProduct(response);
+
                 } catch (error) {
-                    console.error("Failed to fetch project", error);
+                    console.error("Failed to fetch product", error);
                 }
             };
             const fetchFields = async () => {
@@ -40,18 +56,31 @@ const EditProject = () => {
                 }
             };
             fetchFields();
-            fetchProject();
+            fetchProduct();
         }
 
-    }, [projectId]);
+    }, [productId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setProject((prev) => ({
+        setProduct((prev) => ({
             ...prev,
             [name]: value
         }));
     };
+
+    const updateProductForms = async (forms) => {
+        try {
+            let id = productId;
+            if (id) {
+                const response = await doPUT(ENDPOINTS.updateProduct(id), { ...product, forms });
+                setProduct(response);
+            }
+        } catch (error) {
+            console.error("Failed to save product", error);
+            error(error)
+        }
+    }
 
     const handleFormChange = (index, key, value) => {
         const updatedForms = [...forms];
@@ -83,7 +112,7 @@ const EditProject = () => {
     }
 
     const addForm = () => {
-        setForms([...forms, { title: '', fields: [], project: project?._id }]);
+        setForms([...forms, { title: '', fields: [], product: product?._id }]);
     };
 
     const addFieldToForm = (formIndex) => {
@@ -98,45 +127,44 @@ const EditProject = () => {
         setForms(updatedForms);
     };
 
-    const handleProjectSubmit = async (e) => {
+    const handleProductSubmit = async (e) => {
         e.preventDefault();
         try {
-            let id = projectId;
-            if (!project?.name || !project?.domain) {
+            let id = productId;
+            if (!product?.name) {
                 return error('Please Enter all required Fields');
             }
             if (id) {
-                await doPUT(ENDPOINTS.updateProject(id), project);
+                await doPUT(ENDPOINTS.updateProduct(id), product);
             } else {
-                const projectResponse = await doPOST(ENDPOINTS.addProject, project);
-                id = projectResponse._id;
-                setProject(projectResponse);
-                navigate(`/projects/edit/${id}`);
+                const productResponse = await doPOST(ENDPOINTS.addProduct, { ...product, projectId });
+                id = productResponse._id;
+                setProduct(productResponse);
+                // Update the URL with the new product ID
+                navigate(`/products/edit/${id}`);
             }
-            // Submit forms after project creation/update
-            // forms.forEach((form, index) => {
-            //     handleFormSubmit(index, projectId);
-            // });
-            success(id ? "Project updated" : "Project created");
+            success(id ? "Product updated" : "Product created");
 
         } catch (error) {
-            console.error("Failed to save project", error);
+            console.error("Failed to save product", error);
             error(error)
         }
     };
 
-    const handleFormSubmit = async (formIndex, projectIdInput) => {
+    const handleFormSubmit = async (formIndex) => {
         try {
             const form = forms[formIndex];
             const fields = form.fields.map(field => field?._id);
             if (!form?.title) {
                 return error('Please Enter Form title');
             }
+            let response = null
             if (form._id) {
-                await doPUT(FORMENDPOINTS.updateForm(form._id), { ...form, fields, project: projectIdInput });
+                response = await doPUT(FORMENDPOINTS.updateForm(form._id), { ...form, fields, project: productId });
             } else {
-                await doPOST(FORMENDPOINTS.addForm, { ...form, fields, project: projectIdInput });
+                response = await doPOST(FORMENDPOINTS.addForm, { ...form, fields, project: productId });
             }
+            updateProductForms([...product.forms, response])
             success(form?._id ? "Form updated" : "Form created");
         } catch (error) {
             console.error("Failed to save form", error);
@@ -144,16 +172,37 @@ const EditProject = () => {
         }
     };
 
+    const handleToggle = (form) => {
+        // setProduct(prev => ({ ...prev, useParentForms: !prev?.useParentForms,forms:[] }));
+        const presentForm = product?.forms?.find(productForm => productForm?._id == form?._id);
+        if (presentForm) {
+            updateProductForms( product?.forms?.filter(form => form?._id != presentForm?._id))
+        } else {
+            updateProductForms([...product?.forms, form])
+        }
+    }
+
+    const isFormSelected = (form) =>  product?.forms?.find(productForm => productForm?._id == form?._id);
+
+    const handleDeleteForm=async(form)=>{
+       try {
+        await doDELETE(ENDPOINTS.deleteForm(form?._id));
+        fetchProduct();
+       } catch (error) {
+        
+       }
+    }
+
     return (
         <div className='container'>
-            <Card onSubmit={handleProjectSubmit} className='mt-3 p-2 px-3'>
+            <Card onSubmit={handleProductSubmit} className='mt-3 p-2 px-3'>
                 <div className="mb-3">
-                    <label className='mb-1 required'>Project Name</label>
+                    <label className='mb-1 required'>Product Name</label>
                     <input
                         type="text"
                         name="name"
                         className="form-control"
-                        value={project?.name}
+                        value={product?.name}
                         onChange={handleChange}
                         placeholder="Enter Name"
                     />
@@ -164,50 +213,58 @@ const EditProject = () => {
                         type="text"
                         name="description"
                         className="form-control"
-                        value={project?.description}
+                        value={product?.description}
                         onChange={handleChange}
                         placeholder="Enter Description"
                     />
                 </div>
-                <div className="mb-3">
-                    <label className='mb-1 required'>Enter Domain</label>
-                    <input
-                        type="text"
-                        name="domain"
-                        className="form-control"
-                        value={project?.domain}
-                        onChange={handleChange}
-                        placeholder="Enter Domain"
-                    />
-                </div>
-                <button onClick={handleProjectSubmit} className="btn btn-outline-success" style={{
+                <button onClick={handleProductSubmit} className="btn btn-outline-success align-self-start" style={{
                     position: "relative",
-                    width: projectId ? "140px" : "120px"
-                }}>{projectId ? "Update" : "Save"} Project</button>
+                    // width: productId ? "140px" : "120px"
+                }}>{productId ? "Update" : "Save"} Product</button>
             </Card>
 
-            {project?._id && (
+
+            <button onClick={addForm} className="btn btn-secondary mt-3">Add Form</button>
+
+            {product?._id && (
                 <div className='mt-3'>
-                    {/* <button type="button" className="btn btn-primary ms-1 mb-2" onClick={addForm}>Add Form</button> */}
                     {forms?.map((form, formIndex) => (
-                        <Card key={formIndex} className="mb-3 px-4 py-2">
-                            <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, project._id); }}>
+                        <Card key={formIndex} className="mb-3 px-4 py-2 row">
+                            <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, product._id); }}>
+                                {form?.parent ? <div className='d-flex align-items-center gap-2 my-2'>
+                                    <input type='checkbox' checked={isFormSelected(form)} onChange={() => handleToggle(form)} name="Use Parent Forms" />
+                                    <label className=''>Use Parent Form</label>
+                                </div> : null}
                                 <div className='d-flex align-items-end my-2'>
                                     <div>
                                         <label className='mb-1 required'>Form Title</label>
                                         <input
                                             type="text"
                                             className="form-control"
+                                            readOnly={form?.parent}
                                             value={form.title}
                                             onChange={(e) => handleFormChange(formIndex, 'title', e.target.value)}
                                             placeholder="Enter Form Title"
                                         />
                                     </div>
-                                    <button type="button" className="btn btn-secondary mx-2" onClick={() => addFieldToForm(formIndex)}>Add Field</button>
+                                    <div>
+                                        <label className='mb-1 ms-2 required'>Form Number</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            readOnly={form?.parent}
+                                            value={form?.formIndex}
+                                            onChange={(e) => handleFormChange(formIndex, 'formIndex', e.target.value)}
+                                            placeholder="Enter Form Number"
+                                        />
+                                    </div>
+                                    <button disabled={form?.parent} type="button" className="btn btn-secondary mx-2" onClick={() => addFieldToForm(formIndex)}>Add Field</button>
                                 </div>
                                 {form?.fields?.map((field, fieldIndex) => (
                                     <div key={fieldIndex} className="input-group mb-2 w-50">
                                         <select
+                                            disabled={form?.parent}
                                             className="form-select"
                                             value={field?._id || ''}
                                             onChange={(e) => handleFieldChange(formIndex, fieldIndex, '_id', e.target.value)}
@@ -219,6 +276,7 @@ const EditProject = () => {
                                         </select>
                                         <div className="form-check m-2">
                                             <input
+                                                readOnly={form?.parent}
                                                 className="form-check-input"
                                                 type="checkbox"
                                                 checked={form?.requiredFields?.includes(field?._id) || false}
@@ -231,6 +289,7 @@ const EditProject = () => {
                                         <button
                                             type="button"
                                             className="btn btn-danger"
+                                            disabled={form?.parent}
                                             onClick={() => removeFieldFromForm(formIndex, fieldIndex)}
                                         >
                                             Remove
@@ -241,6 +300,7 @@ const EditProject = () => {
                                     <div className="form-check m-2">
                                         <input class="form-check-input" type="checkbox" value="" id="flexCheckIndeterminate"
                                             checked={form?.showOTP}
+                                            disabled={form?.parent}
                                             onChange={(e) => handleFormChange(formIndex, 'showOTP', e.target.checked)}
                                         />
                                         <label class="form-check-label" for="flexCheckIndeterminate">
@@ -248,7 +308,10 @@ const EditProject = () => {
                                         </label>
                                     </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary">{form?._id ? "Update" : "Save"} Form</button>
+                                <div className='d-flex gap-2'>
+                                {form?._id && !form?.parent ?<button disabled={form?.parent}  onClick={() => handleDeleteForm(form)} type="submit" className="btn btn-danger">Delete Form</button>:null}
+                                <button disabled={form?.parent} type="submit" className="btn btn-primary">{form?._id ? "Update" : "Save"} Form</button>
+                                 </div>   
                             </form>
                         </Card>
                     ))}
@@ -258,4 +321,4 @@ const EditProject = () => {
     );
 };
 
-export default EditProject;
+export default EditProduct;

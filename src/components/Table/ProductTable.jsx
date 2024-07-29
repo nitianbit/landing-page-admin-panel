@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { MdEdit, MdDelete } from "react-icons/md";
 import Modal from '../Modal/Modal';
-import { ENDPOINTS } from '../../pages/Projects/Constant';
+import { ENDPOINTS } from '../../pages/Products/Constant';
 import { doDELETE, doPOST, doPUT } from '../../utils/HttpUtil';
 import { AppContext } from '../../services/context/AppContext';
 import { useNavigate } from 'react-router-dom';
 
-const ProjectTable = ({ tableData, getAllProjects }) => {
+const ProductsTable = ({ selectedProject, tableData, getAllProjects }) => {
 
     const navigate = useNavigate();
 
@@ -20,58 +20,10 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
         selectedProject: null
     })
 
-    const handleUpdateData = async () => {
-        try {
-            setLoading(true)
-            if (!editState.selectedProject?._id) {
-                await doPOST(ENDPOINTS.addProject, editState.selectedProject)
-            } else {
-                await doPUT(ENDPOINTS.updateProject(editState.selectedProject?._id), editState.selectedProject)
-            }
-            setEditState({
-                isModalOpen: false,
-                selectedProject: null
-            })
-            getAllProjects()
-            success("Project Updated Successfully")
-        } catch (e) {
-            error("Server error")
-        } finally {
-            setLoading(false)
-
-        }
-    }
-
-    const updateData = (updatedObj) => setEditState(prev => ({
-        ...prev,
-        selectedProject: {
-            ...prev.selectedProject,
-            ...updatedObj
-        }
-    }))
-
-
-    const openModal = (selectedProject) => {
-        setEditState(prev => ({
-            ...prev,
-            isModalOpen: true,
-            selectedProject
-        }));
-    };
-
-
-    const closeEditModal = () => {
-        setEditState(prev => ({
-            ...prev,
-            isModalOpen: false,
-            selectedProject: null
-        }));
-    };
-
     const deleteProject = async () => {
         try {
             setLoading(true)
-            const response = await doDELETE(ENDPOINTS.deleteProject(deleteProjectId))
+            const response = await doDELETE(ENDPOINTS.deleteProduct(deleteProjectId))
             setDeleteProjectId(null)
             getAllProjects()
             success("Project deleted Successfully")
@@ -95,9 +47,8 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
     return (
         <div className='w-100'>
             <button onClick={(e) => {
-                // openModal(true);
-                navigate("/projects/create")
-            }} className="btn btn-primary my-2" type="submit">Add Project</button>
+                navigate(`/products/create/${selectedProject}`)
+            }} className="btn btn-primary my-2" type="submit">Add Product</button>
             <div className="container shadow-sm bg-white p-2 w-100">
                 <div className="table-wrapper">
                     <table className="table">
@@ -115,7 +66,7 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
                                     <td>{row.name}</td>
                                     <td>
                                         <MdEdit onClick={() => {
-                                            navigate(`/projects/edit/${row?._id}`)
+                                            navigate(`/products/edit/${row?._id}`)
                                         }} className='cursor-pointer' color='#8296EE' />
                                         <MdDelete onClick={() => {
                                             setDeleteProjectId(row?._id)
@@ -158,4 +109,4 @@ const ProjectTable = ({ tableData, getAllProjects }) => {
     );
 };
 
-export default ProjectTable;
+export default ProductsTable;
