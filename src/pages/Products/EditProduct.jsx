@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { doGET, doPOST, doPUT } from '../../utils/HttpUtil';
+import { doDELETE, doGET, doPOST, doPUT } from '../../utils/HttpUtil';
 import { ENDPOINTS } from './Constant';
 import { FORMENDPOINTS } from '../FormPage/Constant';
 import { FieldENDPOINTS } from '../FieldPage/Constant';
@@ -19,23 +19,25 @@ const EditProduct = () => {
     const [fields, setFields] = useState([]);
     const [parentForms, setParentForms] = useState([]);
 
+    const fetchProduct = async () => {
+        try {
+            const response = await doGET(ENDPOINTS.getProductById(productId));
+            setProduct({...response,product});
+            if (response?.parent) {
+                const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(response?.parent));
+                setParentForms(formsResponse?.map(form => ({ ...form, parent: true })));
+                const productForms = await doGET(FORMENDPOINTS.getFormByProjectId(productId));
+                setForms([...formsResponse?.map(form => ({ ...form, parent: true })), ...productForms]);
+            }
+
+        } catch (error) {
+            console.error("Failed to fetch product", error);
+        }
+    };
+
     useEffect(() => {
         if (productId) {
-            const fetchProduct = async () => {
-                try {
-                    const response = await doGET(ENDPOINTS.getProductById(productId));
-                    setProduct(response);
-                    if (response?.parent) {
-                        const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(response?.parent));
-                        setParentForms(formsResponse?.map(form => ({ ...form, parent: true })));
-                        const productForms = await doGET(FORMENDPOINTS.getFormByProjectId(productId));
-                        setForms([...formsResponse?.map(form => ({ ...form, parent: true })), ...productForms]);
-                    }
 
-                } catch (error) {
-                    console.error("Failed to fetch product", error);
-                }
-            };
             const fetchProjectForms = async () => {
                 try {
                     const response = await doGET(ENDPOINTS.getFormByProjectId(productId));
@@ -162,7 +164,7 @@ const EditProduct = () => {
             } else {
                 response = await doPOST(FORMENDPOINTS.addForm, { ...form, fields, project: productId });
             }
-            updateProductForms([...product.forms, response?._id])
+            updateProductForms([...product.forms, response])
             success(form?._id ? "Form updated" : "Form created");
         } catch (error) {
             console.error("Failed to save form", error);
@@ -172,12 +174,23 @@ const EditProduct = () => {
 
     const handleToggle = (form) => {
         // setProduct(prev => ({ ...prev, useParentForms: !prev?.useParentForms,forms:[] }));
-        const presentForm = product?.forms?.find(id => id == form?._id);
+        const presentForm = product?.forms?.find(productForm => productForm?._id == form?._id);
         if (presentForm) {
-            updateProductForms(Array.from(new Set(product?.forms?.filter(id => id != presentForm))))
+            updateProductForms( product?.forms?.filter(form => form?._id != presentForm?._id))
         } else {
-            updateProductForms(Array.from(new Set([...product?.forms, form?._id])))
+            updateProductForms([...product?.forms, form])
         }
+    }
+
+    const isFormSelected = (form) =>  product?.forms?.find(productForm => productForm?._id == form?._id);
+
+    const handleDeleteForm=async(form)=>{
+       try {
+        await doDELETE(ENDPOINTS.deleteForm(form?._id));
+        fetchProduct();
+       } catch (error) {
+        
+       }
     }
 
     return (
@@ -220,7 +233,7 @@ const EditProduct = () => {
                         <Card key={formIndex} className="mb-3 px-4 py-2 row">
                             <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, product._id); }}>
                                 {form?.parent ? <div className='d-flex align-items-center gap-2 my-2'>
-                                    <input type='checkbox' checked={product?.forms?.includes(form?._id)} onChange={() => handleToggle(form)} name="Use Parent Forms" />
+                                    <input type='checkbox' checked={isFormSelected(form)} onChange={() => handleToggle(form)} name="Use Parent Forms" />
                                     <label className=''>Use Parent Form</label>
                                 </div> : null}
                                 <div className='d-flex align-items-end my-2'>
@@ -295,7 +308,10 @@ const EditProduct = () => {
                                         </label>
                                     </div>
                                 </div>
+                                <div className='d-flex gap-2'>
+                                {form?._id && !form?.parent ?<button disabled={form?.parent}  onClick={() => handleDeleteForm(form)} type="submit" className="btn btn-danger">Delete Form</button>:null}
                                 <button disabled={form?.parent} type="submit" className="btn btn-primary">{form?._id ? "Update" : "Save"} Form</button>
+                                 </div>   
                             </form>
                         </Card>
                     ))}
