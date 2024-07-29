@@ -12,4 +12,5 @@ export const ENDPOINTS = {
 
     updateProduct: (id) => `/product/${id}`,
     deleteProduct: (id) => `/product/${id}`,
+    deleteForm: (id) => `/form/${id}/delete`,
 }
