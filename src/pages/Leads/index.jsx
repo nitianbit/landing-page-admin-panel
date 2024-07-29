@@ -96,13 +96,17 @@ const Leads = () => {
     }, [projectFormValue.projectId]);
 
     useEffect(() => {
-        if (projectFormValue.projectId && projectFormValue.formId) {
+
+        if (projectFormValue.projectId && projectFormValue.formId && !projectFormValue.refererId) {
             getProjectFormLeads();
+        }
+        if (projectFormValue.refererId) {
+            getProjectFormLeads(projectFormValue.refererId);
         }
         if (projectFormValue?.formId) {
             filterFormHeaders();
         }
-    }, [projectFormValue.formId, projectFormValue.projectId]);
+    }, [projectFormValue.formId, projectFormValue.projectId, projectFormValue.refererId]);
 
     return (
         <div className='w-100'>
@@ -132,20 +136,22 @@ const Leads = () => {
                         value={projectFormValue?.refererId}
                         onChange={(e) => {
                             setProjectFormValue((prev) => ({ ...prev, refererId: e.target.value }));
-                            getProjectFormLeads(e.target.value);
+                            // getProjectFormLeads(e.target.value);
                             // getFormByProjectId(e.target.value);
                             const product = products?.find((product) => product?._id === e.target.value)
+                            if (!product) {
+                                getFormByProjectId()
+                            }
                             if (product?.forms) {
                                 setFormsByProject(product?.forms);
                                 setProjectFormValue((prev) => ({
                                     ...prev,
-                                    formId: product?.forms[0]?._id || null
+                                    formId: product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null
                                 }));
                             }
-
                         }}
                     >
-                        <option selected>Open this select Form</option>
+                        <option selected value="">Front Page</option>
                         {products?.map((item) => (
                             <option key={item?._id} value={item?._id}>
                                 {item?.name}

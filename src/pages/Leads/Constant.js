@@ -1,7 +1,6 @@
 export const ENDPOINTS = {
     // addLead: `addProject`,
     getProjects: 'getProjects',
-    getProjectFormValue: (projectId, formId) => `/getFormValues/${projectId}/${formId}`,
 
     getFormByProjectId: (id) => `/project/${id}/Forms`,
     getProductsByProject: (id) => `/getProductsByProject/${id}`,
