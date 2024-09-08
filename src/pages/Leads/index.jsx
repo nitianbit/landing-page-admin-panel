@@ -192,7 +192,7 @@ const Leads = () => {
                     </div>
                 )}
                 </div>
-                <Button onClick={()=>getProjectFormLeads(null,true)} className='my-4'>Download</Button>
+                <Button onClick={()=>getProjectFormLeads(projectFormValue?.refererId,true)} className='my-4'>Download</Button>
             </div>
             <LeadsTable tableHeaders={projectFormValue?.headers} tableData={projectFormValue?.data} />
         </div>
