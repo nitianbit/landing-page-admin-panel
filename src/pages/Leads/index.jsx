@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ENDPOINTS } from './Constant.js'; // Assuming doGET is a function to make GET requests
 import { doGET } from '../../utils/HttpUtil.jsx';
 import { LeadsTable } from '../../components'
+import { Button } from 'reactstrap';
 
 const Leads = () => {
     const [leads, setLeads] = useState(null);
@@ -40,16 +41,28 @@ const Leads = () => {
         }
     };
 
-    const getProjectFormLeads = async (refererId) => {
+    const getProjectFormLeads = async (refererId,download=false) => {
         try {
-            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId));
+            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId,download));
             if (response) {
-                // setProjects(response);
-                setProjectFormValue((prev) => ({
-                    ...prev,
-                    data: response?.filter((lead) => lead?.refererId === refererId)
-                }));
-                // setProjectFormValue(response?.values)
+                if (download) {
+                    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.data);
+                    const link = document.createElement('a');
+                    link.href = csvContent;
+                    link.target = '_blank';
+                    link.download = 'leads.csv';
+
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    // setProjects(response);
+                    setProjectFormValue((prev) => ({
+                        ...prev,
+                        data: response?.filter((lead) => lead?.refererId === refererId)
+                    }));
+                    // setProjectFormValue(response?.values)
+                }
             }
         } catch (error) {
             console.error("Error fetching projects: ", error);
@@ -110,7 +123,8 @@ const Leads = () => {
 
     return (
         <div className='w-100'>
-            <div className='d-flex'>
+            <div className='d-flex justify-content-between'>
+                <div className='d-flex align-items-center '>
                 {projects && (
                     <div className="m-3">
                         <label className='mb-1'>Projects</label>
@@ -177,6 +191,8 @@ const Leads = () => {
                         </select>
                     </div>
                 )}
+                </div>
+                <Button onClick={()=>getProjectFormLeads(projectFormValue?.refererId,true)} className='my-4'>Download</Button>
             </div>
             <LeadsTable tableHeaders={projectFormValue?.headers} tableData={projectFormValue?.data} />
         </div>
