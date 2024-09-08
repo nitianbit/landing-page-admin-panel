@@ -6,8 +6,22 @@ export const ENDPOINTS = {
     getProductsByProject: (id) => `/getProductsByProject/${id}`,
 
     // getProjectFormLead: (projectId, formId, refererId) => `/getFormValues/${projectId}/${formId}${refererId ? `?refererId=${refererId}` : ''}`,
-    getProjectFormLead: (projectId, formId, refererId,download=false) => `/getFormValues/${projectId}/${formId}?${refererId ? `refererId=${refererId}` : ''}${download ? `&download=true` : ''}`,
-
+    getProjectFormLead: (projectId, formId, refererId, download = false) => {
+        let url = `/getFormValues/${projectId}/${formId}?`;
+      
+        if (refererId) {
+          url += `refererId=${refererId}`;
+        }
+      
+        if (download) {
+          if (refererId) {
+            url += '&';
+          }
+          url += 'download=true';
+        }
+      
+        return url;
+      },
 
     getProjectById: (id) => `/project/${id}`,
 
