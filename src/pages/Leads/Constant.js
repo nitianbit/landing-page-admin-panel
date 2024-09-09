@@ -2,7 +2,7 @@ export const ENDPOINTS = {
     // addLead: `addProject`,
     getProjects: 'getProjects',
 
-    getFormByProjectId: (id) => `/project/${id}/Forms`,
+    getFormByProjectId: (id,type=null) => `/project/${id}/Forms${type ? `?type=${type}` : ''}`,
     getProductsByProject: (id) => `/getProductsByProject/${id}`,
 
     // getProjectFormLead: (projectId, formId, refererId) => `/getFormValues/${projectId}/${formId}${refererId ? `?refererId=${refererId}` : ''}`,
