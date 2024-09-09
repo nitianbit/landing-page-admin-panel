@@ -43,7 +43,7 @@ const Leads = () => {
         }
     };
 
-    const getProjectFormLeads = async (refererId, download = false) => {
+    const getFormData = async (refererId, download = false) => {
         try {
             const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId, download));
             if (response) {
@@ -61,7 +61,7 @@ const Leads = () => {
                     // setProjects(response);
                     setProjectFormValue((prev) => ({
                         ...prev,
-                        data: response?.filter((lead) => lead?.refererId === refererId)
+                        data: response?.filter((lead) => lead?.refererId === refererId),
                     }));
                     // setProjectFormValue(response?.values)
                 }
@@ -73,7 +73,7 @@ const Leads = () => {
 
     const getFormByProjectId = async () => {
         try {
-            const response = await doGET(ENDPOINTS.getFormByProjectId(projectFormValue.projectId));
+            const response = await doGET(ENDPOINTS.getFormByProjectId(projectFormValue.projectId,formType));
             if (response) {
                 setFormsByProject(response);
                 setProjectFormValue((prev) => ({
@@ -108,15 +108,15 @@ const Leads = () => {
         if (projectFormValue.projectId) {
             getFormByProjectId();
         }
-    }, [projectFormValue.projectId]);
+    }, [projectFormValue.projectId,formType]);
 
     useEffect(() => {
 
         if (projectFormValue.projectId && projectFormValue.formId && !projectFormValue.refererId) {
-            getProjectFormLeads();
+            getFormData();
         }
         if (projectFormValue.refererId) {
-            getProjectFormLeads(projectFormValue.refererId);
+            getFormData(projectFormValue.refererId);
         }
         if (formType) {
             filterFormHeaders();
@@ -145,6 +145,8 @@ const Leads = () => {
                         </div>
                     )}
                     <ToggleButton formType={formType} setFormType={setFormType}/>
+
+                    {formType==="product" &&<>
                     <div className="m-3">
                         <label className='mb-1'>Products</label>
                         <select
@@ -152,7 +154,7 @@ const Leads = () => {
                             value={projectFormValue?.refererId}
                             onChange={(e) => {
                                 setProjectFormValue((prev) => ({ ...prev, refererId: e.target.value }));
-                                // getProjectFormLeads(e.target.value);
+                                // getFormData(e.target.value);
                                 // getFormByProjectId(e.target.value);
                                 const product = products?.find((product) => product?._id === e.target.value)
                                 if (!product) {
@@ -193,8 +195,10 @@ const Leads = () => {
                             </select>
                         </div>
                     )}
+                    </>}
+
                 </div>
-                <Button onClick={() => getProjectFormLeads(projectFormValue?.refererId, true)} className='my-4'>Download</Button>
+                <Button onClick={() => getFormData(projectFormValue?.refererId, true)} className='my-4'>Download</Button>
             </div>
             <LeadsTable tableHeaders={projectFormValue?.headers} tableData={projectFormValue?.data} />
         </div>
