@@ -88,7 +88,7 @@ const Leads = () => {
 
 
     const filterFormHeaders = () => {
-        const form = formsByProject?.find((form) => form?._id === projectFormValue?.formId);
+        const form = formsByProject?.find((form) =>  form?.type == formType);
         if (form) {
             setProjectFormValue((prev) => ({
                 ...prev,
@@ -118,10 +118,10 @@ const Leads = () => {
         if (projectFormValue.refererId) {
             getProjectFormLeads(projectFormValue.refererId);
         }
-        if (projectFormValue?.formId) {
+        if (formType) {
             filterFormHeaders();
         }
-    }, [projectFormValue.formId, projectFormValue.projectId, projectFormValue.refererId]);
+    }, [projectFormValue.formId,formType, projectFormValue.projectId, projectFormValue.refererId]);
 
     return (
         <div className='w-100'>
