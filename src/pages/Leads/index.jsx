@@ -3,11 +3,13 @@ import { ENDPOINTS } from './Constant.js'; // Assuming doGET is a function to ma
 import { doGET } from '../../utils/HttpUtil.jsx';
 import { LeadsTable } from '../../components'
 import { Button } from 'reactstrap';
+import ToggleButton from './ToggleButton.jsx';
 
 const Leads = () => {
     const [leads, setLeads] = useState(null);
     const [projects, setProjects] = useState(null);
     const [formsByProject, setFormsByProject] = useState(null);
+    const [formType, setFormType] = useState("contact")
     const [projectFormValue, setProjectFormValue] = useState({
         leads: null,
         headers: null,
@@ -41,9 +43,9 @@ const Leads = () => {
         }
     };
 
-    const getProjectFormLeads = async (refererId,download=false) => {
+    const getProjectFormLeads = async (refererId, download = false) => {
         try {
-            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId,download));
+            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId, download));
             if (response) {
                 if (download) {
                     const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.data);
@@ -125,74 +127,74 @@ const Leads = () => {
         <div className='w-100'>
             <div className='d-flex justify-content-between'>
                 <div className='d-flex align-items-center '>
-                {projects && (
+                    {projects && (
+                        <div className="m-3">
+                            <label className='mb-1'>Projects</label>
+                            <select
+                                className="form-select"
+                                value={projectFormValue?.projectId}
+                                onChange={(e) => setProjectFormValue((prev) => ({ ...prev, projectId: e.target.value }))}
+                            >
+                                <option selected>Open this select Project</option>
+                                {projects?.map((item) => (
+                                    <option key={item?._id} value={item._id}>
+                                        {item?.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                    <ToggleButton formType={formType} setFormType={setFormType}/>
                     <div className="m-3">
-                        <label className='mb-1'>Projects</label>
+                        <label className='mb-1'>Products</label>
                         <select
                             className="form-select"
-                            value={projectFormValue?.projectId}
-                            onChange={(e) => setProjectFormValue((prev) => ({ ...prev, projectId: e.target.value }))}
+                            value={projectFormValue?.refererId}
+                            onChange={(e) => {
+                                setProjectFormValue((prev) => ({ ...prev, refererId: e.target.value }));
+                                // getProjectFormLeads(e.target.value);
+                                // getFormByProjectId(e.target.value);
+                                const product = products?.find((product) => product?._id === e.target.value)
+                                if (!product) {
+                                    getFormByProjectId()
+                                }
+                                if (product?.forms) {
+                                    setFormsByProject(product?.forms);
+                                    setProjectFormValue((prev) => ({
+                                        ...prev,
+                                        formId: product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null
+                                    }));
+                                }
+                            }}
                         >
-                            <option selected>Open this select Project</option>
-                            {projects?.map((item) => (
-                                <option key={item?._id} value={item._id}>
+                            <option selected value="">Front Page</option>
+                            {products?.map((item) => (
+                                <option key={item?._id} value={item?._id}>
                                     {item?.name}
                                 </option>
                             ))}
                         </select>
                     </div>
-                )}
 
-                <div className="m-3">
-                    <label className='mb-1'>Products</label>
-                    <select
-                        className="form-select"
-                        value={projectFormValue?.refererId}
-                        onChange={(e) => {
-                            setProjectFormValue((prev) => ({ ...prev, refererId: e.target.value }));
-                            // getProjectFormLeads(e.target.value);
-                            // getFormByProjectId(e.target.value);
-                            const product = products?.find((product) => product?._id === e.target.value)
-                            if (!product) {
-                                getFormByProjectId()
-                            }
-                            if (product?.forms) {
-                                setFormsByProject(product?.forms);
-                                setProjectFormValue((prev) => ({
-                                    ...prev,
-                                    formId: product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null
-                                }));
-                            }
-                        }}
-                    >
-                        <option selected value="">Front Page</option>
-                        {products?.map((item) => (
-                            <option key={item?._id} value={item?._id}>
-                                {item?.name}
-                            </option>
-                        ))}
-                    </select>
+                    {formsByProject && (
+                        <div className="m-3">
+                            <label className='mb-1'>Forms</label>
+                            <select
+                                className="form-select"
+                                value={projectFormValue?.formId}
+                                onChange={(e) => setProjectFormValue((prev) => ({ ...prev, formId: e.target.value }))}
+                            >
+                                <option selected>Open this select Form</option>
+                                {formsByProject?.map((item) => (
+                                    <option key={item?._id} value={item?._id}>
+                                        {item?.title}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                 </div>
-
-                {formsByProject && (
-                    <div className="m-3">
-                        <label className='mb-1'>Forms</label>
-                        <select
-                            className="form-select"
-                            value={projectFormValue?.formId}
-                            onChange={(e) => setProjectFormValue((prev) => ({ ...prev, formId: e.target.value }))}
-                        >
-                            <option selected>Open this select Form</option>
-                            {formsByProject?.map((item) => (
-                                <option key={item?._id} value={item?._id}>
-                                    {item?.title}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
-                </div>
-                <Button onClick={()=>getProjectFormLeads(projectFormValue?.refererId,true)} className='my-4'>Download</Button>
+                <Button onClick={() => getProjectFormLeads(projectFormValue?.refererId, true)} className='my-4'>Download</Button>
             </div>
             <LeadsTable tableHeaders={projectFormValue?.headers} tableData={projectFormValue?.data} />
         </div>
