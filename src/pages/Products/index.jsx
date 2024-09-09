@@ -76,7 +76,7 @@ const Products = () => {
                         </select>
                     </div>
                 )}
-                {productByProject && (
+                {/* {productByProject && (
                     <div className="m-3">
                         <label className='mb-1'>Products</label>
                         <select
@@ -92,7 +92,7 @@ const Products = () => {
                             ))}
                         </select>
                     </div>
-                )}
+                )} */}
             </div>
             <ProductsTable selectedProject={projectProductValue?.projectId} tableHeaders={projectProductValue?.headers} tableData={productByProject} />
         </div>
