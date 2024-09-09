@@ -36,7 +36,7 @@ const Leads = () => {
                     ...prev,
                     projectId: response[0]?._id || null
                 }));
-                getProductByProject(response[0]?._id)
+                // getProductByProject(response[0]?._id)
             }
         } catch (error) {
             console.error("Error fetching projects: ", error);
@@ -101,6 +101,12 @@ const Leads = () => {
     useEffect(() => {
         getProjects();
     }, []);
+
+    useEffect(() => {
+        if(projectFormValue.projectId) {
+            getProductByProject(projectFormValue.projectId)
+        }
+    }, [projectFormValue.projectId]);
 
 
 
