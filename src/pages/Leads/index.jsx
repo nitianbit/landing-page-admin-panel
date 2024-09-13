@@ -23,11 +23,11 @@ const Leads = () => {
     const getProductByProject = async (projectId) => {
         try {
             const response = await doGET(ENDPOINTS.getProductsByProject(projectId));
-            setProducts(response)
+            setProducts(response);
         } catch (error) {
-
+            console.error("Error fetching products: ", error);
         }
-    }
+    };
 
     const getProjects = async () => {
         try {
@@ -47,6 +47,13 @@ const Leads = () => {
 
     const getFormData = async (refererId, download = false) => {
         try {
+            setProjectFormValue((prev) => ({
+                ...prev,
+                data: [],
+            }));
+            if(!projectFormValue.formId){
+                return;
+            }
             const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId, download));
             if (response) {
                 if (download) {
@@ -60,16 +67,14 @@ const Leads = () => {
                     link.click();
                     document.body.removeChild(link);
                 } else {
-                    // setProjects(response);
                     setProjectFormValue((prev) => ({
                         ...prev,
                         data: response?.filter((lead) => lead?.refererId === refererId),
                     }));
-                    // setProjectFormValue(response?.values)
                 }
             }
         } catch (error) {
-            console.error("Error fetching projects: ", error);
+            console.error("Error fetching form data: ", error);
         }
     };
 
@@ -80,7 +85,14 @@ const Leads = () => {
                 setFormsByProject(response);
                 setProjectFormValue((prev) => ({
                     ...prev,
-                    formId: response[0]?._id || null
+                    formId: response[0]?._id || null,
+                    refererId: formType === "product" && products?.length ? products[0]?._id : null
+                }));
+            }else{
+                setProjectFormValue((prev) => ({
+                    ...prev,
+                    formId: null,
+                    refererId: null
                 }));
             }
         } catch (error) {
@@ -116,7 +128,7 @@ const Leads = () => {
         if (projectFormValue.projectId) {
             getFormByProjectId();
         }
-    }, [projectFormValue.projectId,formType]);
+    }, [projectFormValue.projectId,formType,products]);
 
     useEffect(() => {
 
@@ -154,57 +166,54 @@ const Leads = () => {
                     )}
                     <ToggleButton formType={formType} setFormType={setFormType}/>
 
-                    {formType==="product" &&<>
-                    <div className="m-3">
-                        <label className='mb-1'>Products</label>
-                        <select
-                            className="form-select"
-                            value={projectFormValue?.refererId}
-                            onChange={(e) => {
-                                setProjectFormValue((prev) => ({ ...prev, refererId: e.target.value }));
-                                // getFormData(e.target.value);
-                                // getFormByProjectId(e.target.value);
-                                const product = products?.find((product) => product?._id === e.target.value)
-                                if (!product) {
-                                    getFormByProjectId()
-                                }
-                                if (product?.forms) {
-                                    setFormsByProject(product?.forms);
-                                    setProjectFormValue((prev) => ({
-                                        ...prev,
-                                        formId: product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null
-                                    }));
-                                }
-                            }}
-                        >
-                            <option selected value="">Front Page</option>
-                            {products?.map((item) => (
-                                <option key={item?._id} value={item?._id}>
-                                    {item?.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    {formType === "product" && (
+                        <>
+                            <div className="m-3">
+                                <label className='mb-1'>Products</label>
+                                <select
+                                    className="form-select"
+                                    value={projectFormValue?.refererId}
+                                    onChange={(e) => {
+                                        setProjectFormValue((prev) => ({ ...prev, refererId: e.target.value }));
+                                        const product = products?.find((product) => product?._id === e.target.value);
+                                        if (product?.forms) {
+                                            setFormsByProject(product?.forms);
+                                            setProjectFormValue((prev) => ({
+                                                ...prev,
+                                                formId: product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null
+                                            }));
+                                        } else {
+                                            getFormByProjectId();
+                                        }
+                                    }}
+                                >
+                                    {products?.map((item) => (
+                                        <option key={item?._id} value={item?._id}>
+                                            {item?.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                    {formsByProject && (
-                        <div className="m-3">
-                            <label className='mb-1'>Forms</label>
-                            <select
-                                className="form-select"
-                                value={projectFormValue?.formId}
-                                onChange={(e) => setProjectFormValue((prev) => ({ ...prev, formId: e.target.value }))}
-                            >
-                                <option selected>Open this select Form</option>
-                                {formsByProject?.map((item) => (
-                                    <option key={item?._id} value={item?._id}>
-                                        {item?.title}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                            {formsByProject && (
+                                <div className="m-3">
+                                    <label className='mb-1'>Forms</label>
+                                    <select
+                                        className="form-select"
+                                        value={projectFormValue?.formId}
+                                        onChange={(e) => setProjectFormValue((prev) => ({ ...prev, formId: e.target.value }))}
+                                    >
+                                        <option selected>Open this select Form</option>
+                                        {formsByProject?.map((item) => (
+                                            <option key={item?._id} value={item?._id}>
+                                                {item?.title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                        </>
                     )}
-                    </>}
-
                 </div>
                 <Button onClick={() => getFormData(projectFormValue?.refererId, true)} className='my-4'>Download</Button>
             </div>
