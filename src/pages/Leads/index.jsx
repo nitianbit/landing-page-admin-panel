@@ -14,7 +14,9 @@ const Leads = () => {
         leads: null,
         headers: null,
         formId: null,
-        projectId: null
+        projectId: null,
+        data:null,
+        refererId:null, //productId
     });
     const [products, setProducts] = useState([]);
 
