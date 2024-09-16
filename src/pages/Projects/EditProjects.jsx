@@ -24,8 +24,8 @@ const EditProject = () => {
                 try {
                     const response = await doGET(ENDPOINTS.getProjectById(projectId));
                     setProject(response);
-
-                    const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(projectId));
+                    const query = `type=in[client,contact]`
+                    const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(projectId, query));
                     setForms(formsResponse);
                 } catch (error) {
                     console.error("Failed to fetch project", error);
