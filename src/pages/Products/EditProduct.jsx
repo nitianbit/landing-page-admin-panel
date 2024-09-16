@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { doDELETE, doGET, doPOST, doPUT } from '../../utils/HttpUtil';
 import { ENDPOINTS } from './Constant';
 import { FORMENDPOINTS } from '../FormPage/Constant';
@@ -9,6 +9,11 @@ import { AppContext } from '../../services/context/AppContext';
 
 const EditProduct = () => {
     const { productId, projectId } = useParams();
+    const location = useLocation()
+    const queryParams = useMemo(() => {
+        return new URLSearchParams(location.search)
+    }, [location.search])
+    const project_id = queryParams.get("project")
     const navigate = useNavigate();
     const { success, error } = useContext(AppContext);
     const [product, setProduct] = useState({
@@ -22,13 +27,13 @@ const EditProduct = () => {
     const fetchProduct = async () => {
         try {
             const response = await doGET(ENDPOINTS.getProductById(productId));
-            setProduct({...response,product});
-            if (response?.parent) {
-                const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(response?.parent));
-                setParentForms(formsResponse?.map(form => ({ ...form, parent: true })));
-                const productForms = await doGET(FORMENDPOINTS.getFormByProjectId(productId));
-                setForms([...formsResponse?.map(form => ({ ...form, parent: true })), ...productForms]);
-            }
+            setProduct({ ...response, product });
+            // if (response?.parent) {
+            // const formsResponse = await doGET(FORMENDPOINTS.getFormByProjectId(response?.parent));
+            // setParentForms(formsResponse?.map(form => ({ ...form, parent: true })));
+            //     const productForms = await doGET(FORMENDPOINTS.getFormByProjectId(productId));
+            // }
+            setForms(response?.forms);
 
         } catch (error) {
             console.error("Failed to fetch product", error);
@@ -37,10 +42,9 @@ const EditProduct = () => {
 
     useEffect(() => {
         if (productId) {
-
             const fetchProjectForms = async () => {
                 try {
-                    const response = await doGET(ENDPOINTS.getFormByProjectId(productId));
+                    const response = await doGET(ENDPOINTS.getFormByProjectId(productId ?? project_id));
                     setProduct(response);
 
                 } catch (error) {
@@ -75,6 +79,7 @@ const EditProduct = () => {
             if (id) {
                 const response = await doPUT(ENDPOINTS.updateProduct(id), { ...product, forms });
                 setProduct(response);
+                setForms(forms)
             }
         } catch (error) {
             console.error("Failed to save product", error);
@@ -141,13 +146,12 @@ const EditProduct = () => {
                 id = productResponse._id;
                 setProduct(productResponse);
                 // Update the URL with the new product ID
-                navigate(`/products/edit/${id}`);
+                navigate(`/products/edit/${id}?project=${projectId ?? project_id}`);
             }
             success(id ? "Product updated" : "Product created");
 
         } catch (error) {
             console.error("Failed to save product", error);
-            error(error)
         }
     };
 
@@ -160,15 +164,15 @@ const EditProduct = () => {
             }
             let response = null
             if (form._id) {
-                response = await doPUT(FORMENDPOINTS.updateForm(form._id), { ...form, fields, project: productId });
+                response = await doPUT(FORMENDPOINTS.updateForm(form._id), { ...form, fields, project: projectId??project_id });
+                updateProductForms(product.forms.map((item, index)=>(index == formIndex?response:item)))
             } else {
-                response = await doPOST(FORMENDPOINTS.addForm, { ...form, fields, project: productId });
+                response = await doPOST(FORMENDPOINTS.addForm, { ...form, fields, project:projectId??project_id, type: "product" });
+                updateProductForms([...product.forms, response])
             }
-            updateProductForms([...product.forms, response])
             success(form?._id ? "Form updated" : "Form created");
         } catch (error) {
             console.error("Failed to save form", error);
-            error(error)
         }
     };
 
@@ -176,21 +180,21 @@ const EditProduct = () => {
         // setProduct(prev => ({ ...prev, useParentForms: !prev?.useParentForms,forms:[] }));
         const presentForm = product?.forms?.find(productForm => productForm?._id == form?._id);
         if (presentForm) {
-            updateProductForms( product?.forms?.filter(form => form?._id != presentForm?._id))
+            updateProductForms(product?.forms?.filter(form => form?._id != presentForm?._id))
         } else {
             updateProductForms([...product?.forms, form])
         }
     }
 
-    const isFormSelected = (form) =>  product?.forms?.find(productForm => productForm?._id == form?._id);
+    const isFormSelected = (form) => product?.forms?.find(productForm => productForm?._id == form?._id);
 
-    const handleDeleteForm=async(form)=>{
-       try {
-        await doDELETE(ENDPOINTS.deleteForm(form?._id));
-        fetchProduct();
-       } catch (error) {
-        
-       }
+    const handleDeleteForm = async (form) => {
+        try {
+            await doDELETE(ENDPOINTS.deleteForm(form?._id));
+            fetchProduct();
+        } catch (error) {
+
+        }
     }
 
     return (
@@ -232,10 +236,10 @@ const EditProduct = () => {
                     {forms?.map((form, formIndex) => (
                         <Card key={formIndex} className="mb-3 px-4 py-2 row">
                             <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, product._id); }}>
-                                {form?.parent ? <div className='d-flex align-items-center gap-2 my-2'>
+                                {/* {form?.parent ? <div className='d-flex align-items-center gap-2 my-2'>
                                     <input type='checkbox' checked={isFormSelected(form)} onChange={() => handleToggle(form)} name="Use Parent Forms" />
                                     <label className=''>Use Parent Form</label>
-                                </div> : null}
+                                </div> : null} */}
                                 <div className='d-flex align-items-end my-2'>
                                     <div>
                                         <label className='mb-1 required'>Form Title</label>
@@ -309,9 +313,9 @@ const EditProduct = () => {
                                     </div>
                                 </div>
                                 <div className='d-flex gap-2'>
-                                {form?._id && !form?.parent ?<button disabled={form?.parent}  onClick={() => handleDeleteForm(form)} type="submit" className="btn btn-danger">Delete Form</button>:null}
-                                <button disabled={form?.parent} type="submit" className="btn btn-primary">{form?._id ? "Update" : "Save"} Form</button>
-                                 </div>   
+                                    {form?._id && !form?.parent ? <button disabled={form?.parent} onClick={() => handleDeleteForm(form)} type="submit" className="btn btn-danger">Delete Form</button> : null}
+                                    <button disabled={form?.parent} type="submit" className="btn btn-primary">{form?._id ? "Update" : "Save"} Form</button>
+                                </div>
                             </form>
                         </Card>
                     ))}
