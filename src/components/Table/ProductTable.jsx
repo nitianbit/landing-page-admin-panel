@@ -66,7 +66,7 @@ const ProductsTable = ({ selectedProject, tableData, getAllProjects }) => {
                                     <td>{row.name}</td>
                                     <td>
                                         <MdEdit onClick={() => {
-                                            navigate(`/products/edit/${row?._id}`)
+                                            navigate(`/products/edit/${row?._id}?project=${selectedProject}`)
                                         }} className='cursor-pointer' color='#8296EE' />
                                         <MdDelete onClick={() => {
                                             setDeleteProjectId(row?._id)
