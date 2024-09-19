@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { Button } from 'reactstrap';
 
-const LeadsTable = ({ tableData, tableHeaders }) => {
+const LeadsTable = ({ tableData, tableHeaders, rows,  page, total, goToNextPage,  goToPrevPage, hasNextPage }) => {
 
     const [data, setData] = useState(tableData);
 
@@ -61,21 +62,15 @@ const LeadsTable = ({ tableData, tableHeaders }) => {
                         </tbody>
                     </table>
                     <div className="d-flex justify-content-between align-items-center">
-                        <div className="hint-text me-2 text-grey">Showing <b>{data?.length ?? 0}</b> out of <b>{tableData?.total ?? 0}</b> entries</div>
+                        <div className="hint-text me-2 text-grey">Showing Page <b>{page}</b>  of <b>{total}</b> Page</div>
                         <ul className="pagination mb-0">
-                            <li className="page-item">
-                                <a className="page-link" href="#" aria-label="Previous">
+                            <Button className="page-item" onClick={goToPrevPage}  disabled={page == 1}>
                                     <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li className="page-item"><a className="page-link" href="#">1</a></li>
-                            <li className="page-item"><a className="page-link" href="#">2</a></li>
-                            <li className="page-item"><a className="page-link" href="#">3</a></li>
-                            <li className="page-item">
-                                <a className="page-link" href="#" aria-label="Next">
+                            </Button>
+                            <li className="page-item"><a className="page-link" href="#">{page}</a></li>
+                            <Button className="page-item"  onClick={goToNextPage} disabled={!hasNextPage()}>
                                     <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
+                            </Button>
                         </ul>
                     </div>
                 </div>
