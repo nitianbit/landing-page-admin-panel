@@ -47,10 +47,6 @@ const Leads = () => {
 
     const getFormData = async (refererId, download = false) => {
         try {
-            setProjectFormValue((prev) => ({
-                ...prev,
-                data: [],
-            }));
             if(!projectFormValue.formId){
                 return;
             }
@@ -82,11 +78,15 @@ const Leads = () => {
         try {
             const response = await doGET(ENDPOINTS.getFormByProjectId(projectFormValue.projectId,formType));
             if (response) {
-                setFormsByProject(response);
+                let formId=response[0]?._id;
+                let refererId = formType === "product" && products?.length ? products[0]?._id : null;
+                const filteredProducts=products?.find((product) => product?._id === refererId)
+                setFormsByProject(filteredProducts?.forms); 
+
                 setProjectFormValue((prev) => ({
                     ...prev,
-                    formId: response[0]?._id || null,
-                    refererId: formType === "product" && products?.length ? products[0]?._id : null
+                    formId,
+                    refererId
                 }));
             }else{
                 setProjectFormValue((prev) => ({
