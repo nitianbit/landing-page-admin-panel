@@ -4,19 +4,24 @@ import { doGET } from '../../utils/HttpUtil.jsx';
 import { LeadsTable } from '../../components'
 import { Button } from 'reactstrap';
 import ToggleButton from './ToggleButton.jsx';
+import { usePagination } from '../../hooks/usePagination.jsx';
 
 const Leads = () => {
     const [leads, setLeads] = useState(null);
     const [projects, setProjects] = useState(null);
     const [formsByProject, setFormsByProject] = useState(null);
     const [formType, setFormType] = useState("contact")
+
+    const { page, rows, total, goToNextPage, goToPrevPage, updateTotal, hasNextPage } = usePagination()
+
+
     const [projectFormValue, setProjectFormValue] = useState({
         leads: null,
         headers: null,
         formId: null,
         projectId: null,
-        data:null,
-        refererId:null, //productId
+        data: null,
+        refererId: null, //productId
     });
     const [products, setProducts] = useState([]);
 
@@ -47,13 +52,13 @@ const Leads = () => {
 
     const getFormData = async (refererId, download = false) => {
         try {
-            if(!projectFormValue.formId){
+            if (!projectFormValue.formId) {
                 return;
             }
-            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId, download));
+            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId, download, page, rows));
             if (response) {
                 if (download) {
-                    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.data);
+                    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.data?.rows);
                     const link = document.createElement('a');
                     link.href = csvContent;
                     link.target = '_blank';
@@ -63,9 +68,12 @@ const Leads = () => {
                     link.click();
                     document.body.removeChild(link);
                 } else {
+                    if (response?.total) {
+                        updateTotal(Math.ceil(response?.total / rows))
+                    }
                     setProjectFormValue((prev) => ({
                         ...prev,
-                        data: response?.filter((lead) => lead?.refererId === refererId),
+                        data: response?.data?.rows?.filter((lead) => lead?.refererId === refererId),
                     }));
                 }
             }
@@ -76,19 +84,19 @@ const Leads = () => {
 
     const getFormByProjectId = async () => {
         try {
-            const response = await doGET(ENDPOINTS.getFormByProjectId(projectFormValue.projectId,formType));
+            const response = await doGET(ENDPOINTS.getFormByProjectId(projectFormValue.projectId, formType));
             if (response) {
-                let formId=response[0]?._id;
+                let formId = response[0]?._id;
                 let refererId = formType === "product" && products?.length ? products[0]?._id : null;
-                const filteredProducts=products?.find((product) => product?._id === refererId)
-                setFormsByProject(filteredProducts?.forms); 
+                const filteredProducts = products?.find((product) => product?._id === refererId)
+                setFormsByProject(filteredProducts?.forms);
 
                 setProjectFormValue((prev) => ({
                     ...prev,
                     formId,
                     refererId
                 }));
-            }else{
+            } else {
                 setProjectFormValue((prev) => ({
                     ...prev,
                     formId: null,
@@ -102,7 +110,7 @@ const Leads = () => {
 
 
     const filterFormHeaders = () => {
-        const form = formsByProject?.find((form) =>  form?.type == formType);
+        const form = formsByProject?.find((form) => form?.type == formType);
         if (form) {
             setProjectFormValue((prev) => ({
                 ...prev,
@@ -117,7 +125,7 @@ const Leads = () => {
     }, []);
 
     useEffect(() => {
-        if(projectFormValue.projectId) {
+        if (projectFormValue.projectId) {
             getProductByProject(projectFormValue.projectId)
         }
     }, [projectFormValue.projectId]);
@@ -128,7 +136,7 @@ const Leads = () => {
         if (projectFormValue.projectId) {
             getFormByProjectId();
         }
-    }, [projectFormValue.projectId,formType,products]);
+    }, [projectFormValue.projectId, formType, products]);
 
     useEffect(() => {
 
@@ -141,7 +149,7 @@ const Leads = () => {
         if (formType) {
             filterFormHeaders();
         }
-    }, [projectFormValue.formId,formType, projectFormValue.projectId, projectFormValue.refererId]);
+    }, [projectFormValue.formId, formType, projectFormValue.projectId, projectFormValue.refererId, page, rows]);
 
     return (
         <div className='w-100'>
@@ -164,7 +172,7 @@ const Leads = () => {
                             </select>
                         </div>
                     )}
-                    <ToggleButton formType={formType} setFormType={setFormType}/>
+                    <ToggleButton formType={formType} setFormType={setFormType} />
 
                     {formType === "product" && (
                         <>
@@ -217,7 +225,7 @@ const Leads = () => {
                 </div>
                 <Button onClick={() => getFormData(projectFormValue?.refererId, true)} className='my-4'>Download</Button>
             </div>
-            <LeadsTable tableHeaders={projectFormValue?.headers} tableData={projectFormValue?.data} />
+            <LeadsTable rows={rows} page={page} total={total} goToNextPage={goToNextPage} goToPrevPage={goToPrevPage} hasNextPage={hasNextPage} tableHeaders={projectFormValue?.headers} tableData={projectFormValue?.data} />
         </div>
     );
 };
