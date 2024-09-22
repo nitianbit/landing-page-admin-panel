@@ -1,1 +1,1 @@
-export const FieldTypeConstants = ["checkbox", "number", "radio", "text", "select", "textarea"]
+export const FieldTypeConstants = ["checkbox", "tel", "radio", "text", "select", "textarea"]
