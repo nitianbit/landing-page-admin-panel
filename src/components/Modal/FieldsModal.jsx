@@ -40,6 +40,18 @@ const EditFieldContent = ({ userData, setUserData }) => {
                     onChange={(e) => {
                         updateData("label", e.target.value)
                     }}
+                    placeholder="Enter Label"
+                />
+            </div>
+            <div className="mb-3">
+                <label className="mb-1 required">Name</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    value={userData?.name ?? ""}
+                    onChange={(e) => {
+                        updateData("name", e.target.value)
+                    }}
                     placeholder="Enter Name"
                 />
             </div>
