@@ -58,7 +58,7 @@ const Leads = () => {
             const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId, download, page, rows));
             if (response) {
                 if (download) {
-                    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.data);
+                    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.rows);
                     const link = document.createElement('a');
                     link.href = csvContent;
                     link.target = '_blank';
@@ -73,7 +73,7 @@ const Leads = () => {
                     }
                     setProjectFormValue((prev) => ({
                         ...prev,
-                        data: response?.data?.rows?.filter((lead) => lead?.refererId === refererId),
+                        data: response?.rows?.filter((lead) => lead?.refererId === refererId),
                     }));
                 }
             }
