@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'reactstrap';
+import { getDate, getTime } from '../../utils/helper';
 
-const LeadsTable = ({ tableData, tableHeaders, rows,  page, total, goToNextPage,  goToPrevPage, hasNextPage }) => {
+const LeadsTable = ({ tableData, tableHeaders,utmParameters, rows,  page, total, goToNextPage,  goToPrevPage, hasNextPage }) => {
 
     const [data, setData] = useState(tableData);
 
@@ -26,6 +27,7 @@ const LeadsTable = ({ tableData, tableHeaders, rows,  page, total, goToNextPage,
         setData(updatedData);
 
     }, [tableData, tableHeaders])
+     
 
     return (
         <div >
@@ -39,7 +41,11 @@ const LeadsTable = ({ tableData, tableHeaders, rows,  page, total, goToNextPage,
                                     <th key={thIndex} className='font-weight-600' scope="col">{item?.label}</th>
                                 ))}
                                 <th>IP Address</th>
-                                <th>UTM Parameters</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                {utmParameters?.map((utm, utmIndex)=>{
+                                    return <th key={utmIndex} className='font-weight-600' scope="col">{utm}</th>
+                                })}
                             </tr>
                         </thead>
                         <tbody className='text-grey'>
@@ -52,11 +58,11 @@ const LeadsTable = ({ tableData, tableHeaders, rows,  page, total, goToNextPage,
                                     <td>
                                         {row?.ipAddress}
                                     </td>
-                                    <td>
+                                    <td>{getDate(row?.submittedAt)}</td>
+                                    <td>{getTime(row?.submittedAt)}</td>
                                         {Object?.entries(row?.utmParameters || {}).map(([key, value]) => (
-                                            <li key={key}>{`${key}: ${value}`}</li>
+                                            <td key={key}>{` ${value}`}</td>
                                         ))}
-                                    </td>
                                 </tr>
                             ))}
                         </tbody>
