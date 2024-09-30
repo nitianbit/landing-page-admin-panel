@@ -17,6 +17,7 @@ const EditProject = () => {
     });
     const [forms, setForms] = useState([]);
     const [fields, setFields] = useState([]);
+    const [utmParameter, setUtmParameter] = useState([])
 
     useEffect(() => {
         if (projectId) {
@@ -91,6 +92,24 @@ const EditProject = () => {
         updatedForms[formIndex].fields.push({ _id: fields.length ? fields[0]._id : '' });
         setForms(updatedForms);
     };
+
+    const addUtmParameters = (formIndex,) => {
+        const updatedForms = [...forms];
+        updatedForms[formIndex].utmParameters.push("")
+        setForms(updatedForms);
+    }
+
+    const removeUtmParameters = (formIndex, utmIndex) => {
+        const updatedForms = [...forms];
+        updatedForms[formIndex].utmParameters.splice(utmIndex, 1)
+        setForms(updatedForms);
+    }
+
+    const handleUtmParameters = (formIndex, utmIndex,  value)=>{
+        const updatedForms = [...forms];
+        updatedForms[formIndex].utmParameters[utmIndex] = value;
+        setForms(updatedForms);
+    }
 
     const removeFieldFromForm = (formIndex, fieldIndex) => {
         const updatedForms = [...forms];
@@ -191,64 +210,88 @@ const EditProject = () => {
                     {/* <button type="button" className="btn btn-primary ms-1 mb-2" onClick={addForm}>Add Form</button> */}
                     {forms?.map((form, formIndex) => (
                         <Card key={formIndex} className="mb-3 px-4 py-2">
-                            <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, project._id); }}>
-                                <div className='d-flex align-items-end my-2'>
-                                    <div>
-                                        <label className='mb-1 required'>Form Title</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            value={form.title}
-                                            onChange={(e) => handleFormChange(formIndex, 'title', e.target.value)}
-                                            placeholder="Enter Form Title"
-                                        />
-                                    </div>
-                                    <button type="button" className="btn btn-secondary mx-2" onClick={() => addFieldToForm(formIndex)}>Add Field</button>
-                                </div>
-                                {form?.fields?.map((field, fieldIndex) => (
-                                    <div key={fieldIndex} className="input-group mb-2 w-50">
-                                        <select
-                                            className="form-select"
-                                            value={field?._id || ''}
-                                            onChange={(e) => handleFieldChange(formIndex, fieldIndex, '_id', e.target.value)}
-                                        >
-                                            <option value="" disabled>Select a field</option>
-                                            {fields?.map((f) => (
-                                                <option key={f?._id} value={f?._id}>{f?.label}</option>
-                                            ))}
-                                        </select>
-                                        <div className="form-check m-2">
+                            <form className='row' onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formIndex, project._id); }}>
+                                <div className='col-8 pe-4'>
+                                    <div className='d-flex align-items-end my-2'>
+                                        <div>
+                                            <label className='mb-1 required'>Form Title</label>
                                             <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                checked={form?.requiredFields?.includes(field?._id) || false}
-                                                onChange={(e) => handleRequiredFields(formIndex, field?._id)}
+                                                type="text"
+                                                className="form-control"
+                                                value={form.title}
+                                                onChange={(e) => handleFormChange(formIndex, 'title', e.target.value)}
+                                                placeholder="Enter Form Title"
                                             />
-                                            <label className="form-check-label">
-                                                Is Required
+                                        </div>
+                                        <button type="button" className="btn btn-secondary mx-2" onClick={() => addFieldToForm(formIndex)}>Add Field</button>
+                                    </div>
+                                    {form?.fields?.map((field, fieldIndex) => (
+                                        <div key={fieldIndex} className="input-group mb-2 w-100">
+                                            <select
+                                                className="form-select"
+                                                value={field?._id || ''}
+                                                onChange={(e) => handleFieldChange(formIndex, fieldIndex, '_id', e.target.value)}
+                                            >
+                                                <option value="" disabled>Select a field</option>
+                                                {fields?.map((f) => (
+                                                    <option key={f?._id} value={f?._id}>{f?.label}</option>
+                                                ))}
+                                            </select>
+                                            <div className="form-check m-2">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    checked={form?.requiredFields?.includes(field?._id) || false}
+                                                    onChange={(e) => handleRequiredFields(formIndex, field?._id)}
+                                                />
+                                                <label className="form-check-label">
+                                                    Is Required
+                                                </label>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                className="btn btn-danger"
+                                                onClick={() => removeFieldFromForm(formIndex, fieldIndex)}
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <div>
+                                        <div className="form-check m-2">
+                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckIndeterminate"
+                                                checked={form?.showOTP}
+                                                onChange={(e) => handleFormChange(formIndex, 'showOTP', e.target.checked)}
+                                            />
+                                            <label class="form-check-label" for="flexCheckIndeterminate">
+                                                Show OTP
                                             </label>
                                         </div>
-                                        <button
-                                            type="button"
-                                            className="btn btn-danger"
-                                            onClick={() => removeFieldFromForm(formIndex, fieldIndex)}
-                                        >
-                                            Remove
-                                        </button>
                                     </div>
-                                ))}
-                                <div>
-                                    <div className="form-check m-2">
-                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckIndeterminate"
-                                            checked={form?.showOTP}
-                                            onChange={(e) => handleFormChange(formIndex, 'showOTP', e.target.checked)}
-                                        />
-                                        <label class="form-check-label" for="flexCheckIndeterminate">
-                                            Show OTP
-                                        </label>
-                                    </div>
+                                    <button type="submit" className="btn btn-primary">{form?._id ? "Update" : "Save"} Form</button>
                                 </div>
-                                <button type="submit" className="btn btn-primary">{form?._id ? "Update" : "Save"} Form</button>
+                                <div className='col-4'>
+                                    <button type="button" className="btn btn-secondary mx-2" onClick={() => addUtmParameters(formIndex)}>Add UTM Parameters</button>
+                                    {form?.utmParameters?.map((utm, utmIndex) => (
+                                        <div className='d-flex' index={`${formIndex} + ${utmIndex}`}>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={utm??""}
+                                                onChange={(e) => handleUtmParameters(formIndex, utmIndex, e.target.value)}
+                                                placeholder="Enter UTM Parameter"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-danger"
+                                                onClick={() => removeUtmParameters(formIndex, utmIndex)}
+                                            >
+                                                Remove UTM
+                                            </button>
+                                        </div>
+
+                                    ))}
+                                </div>
                             </form>
                         </Card>
                     ))}
