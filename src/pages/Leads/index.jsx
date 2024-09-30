@@ -10,7 +10,7 @@ const Leads = () => {
     const [leads, setLeads] = useState(null);
     const [projects, setProjects] = useState(null);
     const [formsByProject, setFormsByProject] = useState(null);
-    const [formType, setFormType] = useState("contact")
+    const [formType, setFormType] = useState("product")
 
     const { page, rows, total, goToNextPage, goToPrevPage, updateTotal, hasNextPage } = usePagination()
 
@@ -88,8 +88,12 @@ const Leads = () => {
             if (response) {
                 let formId = response[0]?._id;
                 let refererId = formType === "product" && products?.length ? products[0]?._id : null;
-                const filteredProducts = products?.find((product) => product?._id === refererId)
-                setFormsByProject(filteredProducts?.forms);
+                if (refererId) {
+                    const filteredProducts = products?.find((product) => product?._id === refererId)
+                    setFormsByProject(filteredProducts?.forms);
+                } else {
+                    setFormsByProject(response)
+                }
 
                 setProjectFormValue((prev) => ({
                     ...prev,
@@ -110,11 +114,12 @@ const Leads = () => {
 
 
     const filterFormHeaders = () => {
-        const form = formsByProject?.find((form) => form?.type == formType);
+        const form = formsByProject?.find((form) =>( form?.type == formType && form?._id == projectFormValue?.formId));
         if (form) {
             setProjectFormValue((prev) => ({
                 ...prev,
-                headers: form?.fields ?? []
+                headers: form?.fields ?? [],
+                utmParameters: form?.utmParameters
             }));
 
         }
@@ -209,7 +214,9 @@ const Leads = () => {
                                     <select
                                         className="form-select"
                                         value={projectFormValue?.formId}
-                                        onChange={(e) => setProjectFormValue((prev) => ({ ...prev, formId: e.target.value }))}
+                                        onChange={(e) =>
+                                            setProjectFormValue((prev) => ({ ...prev, formId: e.target.value }))
+                                        }
                                     >
                                         <option selected>Open this select Form</option>
                                         {formsByProject?.map((item) => (
@@ -225,7 +232,7 @@ const Leads = () => {
                 </div>
                 <Button onClick={() => getFormData(projectFormValue?.refererId, true)} className='my-4'>Download</Button>
             </div>
-            <LeadsTable rows={rows} page={page} total={total} goToNextPage={goToNextPage} goToPrevPage={goToPrevPage} hasNextPage={hasNextPage} tableHeaders={projectFormValue?.headers} tableData={projectFormValue?.data} />
+            <LeadsTable rows={rows} page={page} total={total} goToNextPage={goToNextPage} goToPrevPage={goToPrevPage} hasNextPage={hasNextPage} tableHeaders={projectFormValue?.headers} tableData={projectFormValue?.data} utmParameters={projectFormValue.utmParameters} />
         </div>
     );
 };
