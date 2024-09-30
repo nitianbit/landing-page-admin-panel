@@ -58,7 +58,7 @@ const Leads = () => {
             const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId, download, page, rows));
             if (response) {
                 if (download) {
-                    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.rows);
+                    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.data);
                     const link = document.createElement('a');
                     link.href = csvContent;
                     link.target = '_blank';
