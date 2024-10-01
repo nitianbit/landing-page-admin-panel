@@ -1,0 +1,49 @@
+ .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    max-height: 500px;  
+    position: relative;
+    border: 1px solid #e0e0e0;
+}
+
+ 
+.table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 1;
+}
+
+ @media (max-width: 768px) {
+    .table-wrapper {
+        overflow-x: scroll;
+    }
+
+    .table {
+        width: 100%;  
+        display: block;  
+    }
+
+    .table thead, .table tbody, .table tr, .table td, .table th {
+        display: block;  
+    }
+
+    .table tbody td {
+        position: relative;
+        padding-left: 50%;  
+        text-align: left;
+    }
+
+    .table tbody td::before {
+        content: attr(data-label); 
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        font-weight: bold;
+    }
+
+ 
+    .table thead {
+        display: none; 
+    }
+}
