@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'reactstrap';
 import { getDate, getTime } from '../../utils/helper';
+import "./styles.css"
 
 const LeadsTable = ({ tableData, tableHeaders, utmParameters, rows, page, total, goToNextPage, goToPrevPage, hasNextPage, updateRowsPerPage }) => {
 
