@@ -17,9 +17,14 @@ export const usePagination = () => {
         setTotal(total)
     }
 
+    const updateRowsPerPage = (newRows) => {
+        setRows(newRows);
+        setPage(1);
+    };
+
     const hasNextPage = ()=>{
         return page < total
     }
 
-    return { page, rows, total, goToNextPage, goToPrevPage, updateTotal, hasNextPage }
+    return { page, rows, total, goToNextPage, goToPrevPage, updateTotal, hasNextPage,updateRowsPerPage }
 }
