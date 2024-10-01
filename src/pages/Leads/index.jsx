@@ -12,7 +12,7 @@ const Leads = () => {
     const [formsByProject, setFormsByProject] = useState(null);
     const [formType, setFormType] = useState("product")
 
-    const { page, rows, total, goToNextPage, goToPrevPage, updateTotal, hasNextPage } = usePagination()
+    const { page, rows, total, goToNextPage, goToPrevPage, hasNextPage, updateTotal, updateRowsPerPage } = usePagination()
 
 
     const [projectFormValue, setProjectFormValue] = useState({
@@ -114,7 +114,7 @@ const Leads = () => {
 
 
     const filterFormHeaders = () => {
-        const form = formsByProject?.find((form) =>( form?.type == formType && form?._id == projectFormValue?.formId));
+        const form = formsByProject?.find((form) => (form?.type == formType && form?._id == projectFormValue?.formId));
         if (form) {
             setProjectFormValue((prev) => ({
                 ...prev,
@@ -232,7 +232,18 @@ const Leads = () => {
                 </div>
                 <Button onClick={() => getFormData(projectFormValue?.refererId, true)} className='my-4'>Download</Button>
             </div>
-            <LeadsTable rows={rows} page={page} total={total} goToNextPage={goToNextPage} goToPrevPage={goToPrevPage} hasNextPage={hasNextPage} tableHeaders={projectFormValue?.headers} tableData={projectFormValue?.data} utmParameters={projectFormValue.utmParameters} />
+            <LeadsTable
+                rows={rows}
+                page={page}
+                total={total}
+                goToNextPage={goToNextPage}
+                goToPrevPage={goToPrevPage}
+                hasNextPage={hasNextPage}
+                tableHeaders={projectFormValue?.headers}
+                tableData={projectFormValue?.data}
+                utmParameters={projectFormValue.utmParameters}
+                updateRowsPerPage={updateRowsPerPage}
+            />
         </div>
     );
 };
