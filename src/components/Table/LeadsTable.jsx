@@ -63,8 +63,8 @@ const LeadsTable = ({ tableData, tableHeaders, utmParameters, rows, page, total,
                                         {row?.ipAddress}
                                     </td>
 
-                                    {Object?.entries(row?.utmParameters || {}).map(([key, value]) => (
-                                        <td key={key}>{` ${value}`}</td>
+                                   {utmParameters?.map((utmKey) => (
+                                     <td key={utmKey}>{row?.utmParameters?.[utmKey] || '-'}</td>  
                                     ))}
                                 </tr>
                             ))}
