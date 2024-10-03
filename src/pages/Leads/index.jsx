@@ -5,11 +5,13 @@ import { LeadsTable } from '../../components'
 import { Button } from 'reactstrap';
 import ToggleButton from './ToggleButton.jsx';
 import { usePagination } from '../../hooks/usePagination.jsx';
+import CustomDateFilter from '../../components/DatePicker/MultiSelectDatePicker.jsx';
 
 const Leads = () => {
     const [leads, setLeads] = useState(null);
     const [projects, setProjects] = useState(null);
     const [formsByProject, setFormsByProject] = useState(null);
+    const [filters, setFilters] = useState({})
     const [formType, setFormType] = useState("product")
 
     const { page, rows, total, goToNextPage, goToPrevPage, hasNextPage, updateTotal, updateRowsPerPage } = usePagination()
@@ -55,7 +57,7 @@ const Leads = () => {
             if (!projectFormValue.formId) {
                 return;
             }
-            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId, download, page, rows));
+            const response = await doGET(ENDPOINTS.getProjectFormLead(projectFormValue?.projectId, projectFormValue?.formId, refererId, download, page, rows, filters?.date?.startDate ?? "", filters?.date?.endDate ?? ""));
             if (response) {
                 if (download) {
                     const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.data);
@@ -154,7 +156,7 @@ const Leads = () => {
         if (formType) {
             filterFormHeaders();
         }
-    }, [projectFormValue.formId, formType, projectFormValue.projectId, projectFormValue.refererId, page, rows]);
+    }, [projectFormValue.formId, formType, projectFormValue.projectId, projectFormValue.refererId, page, rows, filters]);
 
     return (
         <div className='w-100'>
@@ -177,6 +179,14 @@ const Leads = () => {
                             </select>
                         </div>
                     )}
+                    <CustomDateFilter
+                        onDateRangeSelected={(v) => {
+                            setFilters(prev => ({
+                                ...prev,
+                                date: v
+                            }));
+                        }}
+                    />
                     <ToggleButton formType={formType} setFormType={setFormType} />
 
                     {formType === "product" && (
