@@ -6,8 +6,8 @@ export const ENDPOINTS = {
     getProductsByProject: (id) => `/getProductsByProject/${id}`,
 
     // getProjectFormLead: (projectId, formId, refererId) => `/getFormValues/${projectId}/${formId}${refererId ? `?refererId=${refererId}` : ''}`,
-    getProjectFormLead: (projectId, formId, refererId, download = false, page=1, rows=10) => {
-        let url = `/getFormValues/${projectId}/${formId}?page=${page}&rows=${rows}&`;
+    getProjectFormLead: (projectId, formId, refererId, download = false, page=1, rows=10, startDate, endDate) => {
+        let url = `/getFormValues/${projectId}/${formId}?page=${page}&rows=${rows}&startDate=${startDate}&endDate=${endDate}&`;
       
         if (refererId) {
           url += `refererId=${refererId}`;
