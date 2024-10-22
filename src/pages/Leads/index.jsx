@@ -6,6 +6,7 @@ import { Button } from 'reactstrap';
 import ToggleButton from './ToggleButton.jsx';
 import { usePagination } from '../../hooks/usePagination.jsx';
 import CustomDateFilter from '../../components/DatePicker/MultiSelectDatePicker.jsx';
+import { IoMdRefresh } from "react-icons/io";
 
 const Leads = () => {
     const [leads, setLeads] = useState(null);
@@ -240,6 +241,7 @@ const Leads = () => {
                         </>
                     )}
                 </div>
+                <IoMdRefresh className='cursor-pointer' size={24} onClick={() => getFormData(projectFormValue?.refererId, true)}/>
                 <Button onClick={() => getFormData(projectFormValue?.refererId, true)} className='my-4'>Download</Button>
             </div>
             <LeadsTable
