@@ -241,7 +241,7 @@ const Leads = () => {
                         </>
                     )}
                 </div>
-                <IoMdRefresh className='cursor-pointer' size={24} onClick={() => getFormData(projectFormValue?.refererId, true)}/>
+                <IoMdRefresh className='cursor-pointer' size={24} onClick={() => getFormData(projectFormValue?.refererId, false)}/>
                 <Button onClick={() => getFormData(projectFormValue?.refererId, true)} className='my-4'>Download</Button>
             </div>
             <LeadsTable
