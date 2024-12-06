@@ -35,9 +35,9 @@ const Leads = () => {
         formId: null,
         projectId: null,
         values: null,
-        formsByProject: null,
+        formsByProject: [],
         refererId: null, //productId,
-        products:[]
+        products: []
     });
 
 
@@ -45,6 +45,18 @@ const Leads = () => {
         setFormType(type);
         let parms = new URLSearchParams(location.search)
         parms.set('formType', type)
+        // if (!(type === "product")) {
+            
+        // }
+        setData((prev) => ({
+            ...prev,
+            products: [],
+            refererId: null,
+            formId: null
+        }));
+        parms.delete('refererId')
+        parms.delete('productId')
+        parms.delete('formId')
         navigateWithNewParams(parms)
     }
 
@@ -67,12 +79,11 @@ const Leads = () => {
                 setProjects(response);
                 setData((prev) => ({
                     ...prev,
-                    projectId:parms.get("projectId") ?? (response[0]?._id || null)
+                    projectId: parms.get("projectId") ?? (response[0]?._id || null)
                 }));
                 let parms = new URLSearchParams(location.search)
-                parms.set('projectId',parms.get("projectId")?? response[0]?._id)
+                parms.set('projectId', parms.get("projectId") ?? response[0]?._id)
                 navigateWithNewParams(parms)
-                // getProductByProject(response[0]?._id)
             }
         } catch (error) {
             console.error("Error fetching projects: ", error);
@@ -102,7 +113,6 @@ const Leads = () => {
 
             const url = `${ENDPOINTS.getProjectFormLead(qParams.toString(), download)}`;
             const response = await doGET(url)
-            // const response = await doGET(ENDPOINTS.getProjectFormLead(data?.projectId, data?.formId, refererId, download, page, rows, filters?.date?.startDate ?? "", filters?.date?.endDate ?? ""));
             if (response) {
                 if (download) {
                     const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response?.data);
@@ -135,36 +145,33 @@ const Leads = () => {
             let parms = new URLSearchParams(location.search)
             if (response) {
                 let formId = response[0]?._id;
-                let refererId =  parms.get("refererId") ?? ((parms.get("formType") ?? (formType === "product")) && data?.products?.length ? data?.products[0]?._id : null);
+                let refererId = parms.get("refererId") ?? ((parms.get("formType") ?? (formType === "product")) && data?.products?.length ? data?.products[0]?._id : null);
                 if (refererId) {
                     const filteredProducts = data?.products?.find((product) => product?._id === refererId)
-                    // setFormsByProject(filteredProducts?.forms);
                     setData((prev) => ({
                         ...prev,
                         formsByProject: filteredProducts?.forms,
-                        refererId : parms.get("refererId") ?? refererId
+                        refererId: parms.get("refererId") ?? refererId
                     }));
                 } else {
                     setData((prev) => ({
                         ...prev,
                         formsByProject: response
                     }));
-                    // setFormsByProject(response)
                 }
 
                 setData((prev) => ({
                     ...prev,
-                    formId : parms.get("formId") ?? formId,
-                    refererId : parms.get("refererId") ?? refererId
+                    formId: parms.get("formId") ?? formId,
+                    refererId: parms.get("refererId") ?? refererId
                 }));
-                
-                if(!parms.get("formId") && formId){
+
+                if (!parms.get("formId") && formId) {
                     parms.set('formId', formId)
                 }
-                if(!parms.get("refererId") && refererId){
+                if (!parms.get("refererId") && refererId) {
                     parms.set('refererId', refererId)
                 }
-                // parms.set('refererId', refererId)
                 if (!refererId) {
                     parms.delete('refererId')
                 }
@@ -218,20 +225,16 @@ const Leads = () => {
 
     }, [qParams]);
 
-    // Update the URL whenever state changes
-    // useEffect(() => {
-    //     updateQueryParams();
-    // }, [data, page, rows]);
 
     useEffect(() => {
         getProjects();
     }, []);
 
     useEffect(() => {
-        if (data.projectId) {
+        if (data.projectId && formType == "product") {
             getProductByProject(data.projectId)
         }
-    }, [data.projectId]);
+    }, [data.projectId, formType]);
 
 
 
@@ -252,7 +255,7 @@ const Leads = () => {
         if (formType) {
             filterFormHeaders();
         }
-    }, [data.formId, formType, data.projectId,data.formsByProject, data.refererId, page, rows, filters]);
+    }, [data.formId, formType, data.projectId, data.formsByProject, data.refererId, page, rows, filters]);
 
     return (
         <div className='w-100'>
@@ -265,7 +268,7 @@ const Leads = () => {
                                 className="form-select"
                                 value={data?.projectId}
                                 onChange={(e) => {
-                                    setData((prev) => ({ ...prev, projectId: e.target.value , products:[], formsByProject:[]}))
+                                    setData((prev) => ({ ...prev, projectId: e.target.value, products: [], formsByProject: [] }))
                                     let parms = new URLSearchParams(location.search)
                                     parms.set('projectId', e.target.value)
                                     parms.delete("refererId")
