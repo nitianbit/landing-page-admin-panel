@@ -18,16 +18,9 @@ const Leads = () => {
     const navigate = useNavigate()
     const qParams = useMemo(() => new URLSearchParams(location.search), [location.search])
 
-    const navigateWithNewParams = useCallback((params) => {
-        navigate({
-            pathname: location.pathname,
-            search: `?${params.toString()}`,
-            replace: true
-        })
-    }, [location.pathname, navigate])
 
-    const { page, rows, total, goToNextPage, goToPrevPage, hasNextPage, updateTotal, updateRowsPerPage } = usePagination()
 
+    const { page, rows, total, goToNextPage, goToPrevPage, hasNextPage, updateTotal, updateRowsPerPage, resetPageRows, updatePage, updateRows } = usePagination()
 
     const [data, setData] = useState({
         leads: null,
@@ -37,17 +30,22 @@ const Leads = () => {
         values: null,
         formsByProject: [],
         refererId: null, //productId,
-        products: []
+        products: [],
     });
+
+    const navigateWithNewParams = useCallback((params) => {
+        navigate({
+            pathname: location.pathname,
+            search: `?${params.toString()}`,
+            replace: true,
+        });
+    }, [location.pathname, navigate, rows,]);
 
 
     const handleFormType = (type) => {
         setFormType(type);
         let parms = new URLSearchParams(location.search)
         parms.set('formType', type)
-        // if (!(type === "product")) {
-            
-        // }
         setData((prev) => ({
             ...prev,
             products: [],
@@ -57,7 +55,10 @@ const Leads = () => {
         parms.delete('refererId')
         parms.delete('productId')
         parms.delete('formId')
+        parms.set("page", 1);
+        parms.set("rows", 10);
         navigateWithNewParams(parms)
+        // resetPageRows()
     }
 
     const getProductByProject = async (projectId) => {
@@ -76,12 +77,13 @@ const Leads = () => {
         try {
             const response = await doGET(ENDPOINTS.getProjects);
             if (response) {
+                let parms = new URLSearchParams(location.search)
                 setProjects(response);
                 setData((prev) => ({
                     ...prev,
                     projectId: parms.get("projectId") ?? (response[0]?._id || null)
                 }));
-                let parms = new URLSearchParams(location.search)
+                
                 parms.set('projectId', parms.get("projectId") ?? response[0]?._id)
                 navigateWithNewParams(parms)
             }
@@ -208,6 +210,18 @@ const Leads = () => {
         }
     };
 
+    const fetchData = ()=>{
+        if (data.projectId && data.formId && !data.refererId) {
+            getFormData();
+        }
+        if (data.refererId) {
+            getFormData(data.refererId);
+        }
+        if (formType) {
+            filterFormHeaders();
+        }
+    }
+
 
     // Set state from URL on component load
     useEffect(() => {
@@ -220,8 +234,8 @@ const Leads = () => {
             setFormType(queryParams.formType)
         }
 
-        if (queryParams.rows) updateRowsPerPage(queryParams.rows);
-        if (queryParams.page) goToNextPage(queryParams.page - 1);
+        if (queryParams.rows) updateRows(queryParams.rows);
+        if (queryParams.page) updatePage(queryParams.page);
 
     }, [qParams]);
 
@@ -245,16 +259,8 @@ const Leads = () => {
     }, [data.projectId, formType, data?.products]);
 
     useEffect(() => {
-
-        if (data.projectId && data.formId && !data.refererId) {
-            getFormData();
-        }
-        if (data.refererId) {
-            getFormData(data.refererId);
-        }
-        if (formType) {
-            filterFormHeaders();
-        }
+        fetchData()
+       
     }, [data.formId, formType, data.projectId, data.formsByProject, data.refererId, page, rows, filters]);
 
     return (
@@ -273,6 +279,8 @@ const Leads = () => {
                                     parms.set('projectId', e.target.value)
                                     parms.delete("refererId")
                                     parms.delete("formId")
+                                    parms.set("page", 1);
+                                    parms.set("rows", 10);
 
                                     navigateWithNewParams(parms)
                                 }
@@ -319,6 +327,8 @@ const Leads = () => {
                                         } else {
                                             getFormByProjectId();
                                         }
+                                        parms.set("page", 1);
+                                        parms.set("rows", 10);
                                         navigateWithNewParams(parms)
                                     }}
                                 >
@@ -341,6 +351,8 @@ const Leads = () => {
                                             setData((prev) => ({ ...prev, formId: e.target.value }))
                                             let parms = new URLSearchParams(location.search)
                                             parms.set('formId', e.target.value)
+                                            parms.set("page", 1);
+                                            parms.set("rows", 10);
                                             navigateWithNewParams(parms)
                                         }
                                         }
@@ -357,7 +369,7 @@ const Leads = () => {
                         </>
                     )}
                 </div>
-                <IoMdRefresh className='cursor-pointer' size={24} onClick={() => getFormData(data?.refererId, false)} />
+                <IoMdRefresh className='cursor-pointer' size={24} onClick={() => fetchData()} />
                 <Button onClick={() => getFormData(data?.refererId, true)} className='my-4'>Download</Button>
             </div>
             <LeadsTable
