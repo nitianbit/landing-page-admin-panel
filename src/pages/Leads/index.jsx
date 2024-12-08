@@ -222,6 +222,18 @@ const Leads = () => {
         }
     }
 
+    const handleDataFilters = (v) => {
+        setFilters(prev => ({
+            ...prev,
+            date: v
+        }));
+        let parms = new URLSearchParams(location.search)
+        parms.set('startDate', v.startDate)
+        parms.set('endDate', v.endDate)
+
+        navigateWithNewParams(parms)
+    }
+
 
     // Set state from URL on component load
     useEffect(() => {
@@ -296,12 +308,7 @@ const Leads = () => {
                         </div>
                     )}
                     <CustomDateFilter
-                        onDateRangeSelected={(v) => {
-                            setFilters(prev => ({
-                                ...prev,
-                                date: v
-                            }));
-                        }}
+                        onDateRangeSelected={handleDataFilters}
                     />
                     <ToggleButton formType={formType} setFormType={handleFormType} />
 
