@@ -8,11 +8,14 @@ import { usePagination } from '../../hooks/usePagination.jsx';
 import CustomDateFilter from '../../components/DatePicker/MultiSelectDatePicker.jsx';
 import { IoMdRefresh } from "react-icons/io";
 import { useLocation, useNavigate, } from 'react-router-dom';
+import Loader from '../../components/Loader/Loader.jsx';
+
 
 
 const Leads = () => {
     const [projects, setProjects] = useState(null);
     const [filters, setFilters] = useState({})
+    const [loading, setLoading] = useState(true)
     const [formType, setFormType] = useState("product");
     const location = useLocation()
     const navigate = useNavigate()
@@ -83,7 +86,7 @@ const Leads = () => {
                     ...prev,
                     projectId: parms.get("projectId") ?? (response[0]?._id || null)
                 }));
-                
+
                 parms.set('projectId', parms.get("projectId") ?? response[0]?._id)
                 navigateWithNewParams(parms)
             }
@@ -109,6 +112,7 @@ const Leads = () => {
 
     const getFormData = async (refererId, download = false) => {
         try {
+            setLoading(true)
             if (!data.formId) {
                 return;
             }
@@ -136,8 +140,13 @@ const Leads = () => {
                     }));
                 }
             }
+            setLoading(false)
         } catch (error) {
             console.error("Error fetching form data: ", error);
+            setLoading(false)
+        }
+        finally {
+            setLoading(false)
         }
     };
 
@@ -210,7 +219,7 @@ const Leads = () => {
         }
     };
 
-    const fetchData = ()=>{
+    const fetchData = () => {
         if (data.projectId && data.formId && !data.refererId) {
             getFormData();
         }
@@ -272,126 +281,131 @@ const Leads = () => {
 
     useEffect(() => {
         fetchData()
-       
+
     }, [data.formId, formType, data.projectId, data.formsByProject, data.refererId, page, rows, filters]);
 
     return (
-        <div className='w-100'>
-            <div className='d-flex justify-content-between'>
-                <div className='d-flex align-items-center '>
-                    {projects && (
-                        <div className="m-3">
-                            <label className='mb-1'>Projects</label>
-                            <select
-                                className="form-select"
-                                value={data?.projectId}
-                                onChange={(e) => {
-                                    setData((prev) => ({ ...prev, projectId: e.target.value, products: [], formsByProject: [] }))
-                                    let parms = new URLSearchParams(location.search)
-                                    parms.set('projectId', e.target.value)
-                                    parms.delete("refererId")
-                                    parms.delete("formId")
-                                    parms.set("page", 1);
-                                    parms.set("rows", 10);
+        <>
+            {
+                loading ? <Loader /> :
+                    <div className='w-100'>
+                        <div className='d-flex justify-content-between'>
+                            <div className='d-flex align-items-center '>
+                                {projects && (
+                                    <div className="m-3">
+                                        <label className='mb-1'>Projects</label>
+                                        <select
+                                            className="form-select"
+                                            value={data?.projectId}
+                                            onChange={(e) => {
+                                                setData((prev) => ({ ...prev, projectId: e.target.value, products: [], formsByProject: [] }))
+                                                let parms = new URLSearchParams(location.search)
+                                                parms.set('projectId', e.target.value)
+                                                parms.delete("refererId")
+                                                parms.delete("formId")
+                                                parms.set("page", 1);
+                                                parms.set("rows", 10);
 
-                                    navigateWithNewParams(parms)
-                                }
-                                }
-                            >
-                                <option selected>Open this select Project</option>
-                                {projects?.map((item) => (
-                                    <option key={item?._id} value={item._id}>
-                                        {item?.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-                    <CustomDateFilter
-                        onDateRangeSelected={handleDataFilters}
-                    />
-                    <ToggleButton formType={formType} setFormType={handleFormType} />
+                                                navigateWithNewParams(parms)
+                                            }
+                                            }
+                                        >
+                                            <option selected>Open this select Project</option>
+                                            {projects?.map((item) => (
+                                                <option key={item?._id} value={item._id}>
+                                                    {item?.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                                <CustomDateFilter
+                                    onDateRangeSelected={handleDataFilters}
+                                />
+                                <ToggleButton formType={formType} setFormType={handleFormType} />
 
-                    {formType === "product" && (
-                        <>
-                            <div className="m-3">
-                                <label className='mb-1'>Products</label>
-                                <select
-                                    className="form-select"
-                                    value={data?.refererId}
-                                    onChange={(e) => {
-                                        setData((prev) => ({ ...prev, refererId: e.target.value }));
-                                        let parms = new URLSearchParams(location.search)
-                                        parms.set('refererId', e.target.value)
-                                        const product = data?.products?.find((product) => product?._id === e.target.value);
-                                        if (product?.forms) {
-                                            setData((prev) => ({
-                                                ...prev,
-                                                formsByProject: product?.forms,
-                                                formId: product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null
-                                            }));
-                                            parms.set('formId', product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null)
-                                        } else {
-                                            getFormByProjectId();
-                                        }
-                                        parms.set("page", 1);
-                                        parms.set("rows", 10);
-                                        navigateWithNewParams(parms)
-                                    }}
-                                >
-                                    {data?.products?.map((item) => (
-                                        <option key={item?._id} value={item?._id}>
-                                            {item?.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                {formType === "product" && (
+                                    <>
+                                        <div className="m-3">
+                                            <label className='mb-1'>Products</label>
+                                            <select
+                                                className="form-select"
+                                                value={data?.refererId}
+                                                onChange={(e) => {
+                                                    setData((prev) => ({ ...prev, refererId: e.target.value }));
+                                                    let parms = new URLSearchParams(location.search)
+                                                    parms.set('refererId', e.target.value)
+                                                    const product = data?.products?.find((product) => product?._id === e.target.value);
+                                                    if (product?.forms) {
+                                                        setData((prev) => ({
+                                                            ...prev,
+                                                            formsByProject: product?.forms,
+                                                            formId: product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null
+                                                        }));
+                                                        parms.set('formId', product?.forms.sort((a, b) => a.formIndex - b.formIndex)[0]?._id || null)
+                                                    } else {
+                                                        getFormByProjectId();
+                                                    }
+                                                    parms.set("page", 1);
+                                                    parms.set("rows", 10);
+                                                    navigateWithNewParams(parms)
+                                                }}
+                                            >
+                                                {data?.products?.map((item) => (
+                                                    <option key={item?._id} value={item?._id}>
+                                                        {item?.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {data.formsByProject && (
+                                            <div className="m-3">
+                                                <label className='mb-1'>Forms</label>
+                                                <select
+                                                    className="form-select"
+                                                    value={data?.formId}
+                                                    onChange={(e) => {
+
+                                                        setData((prev) => ({ ...prev, formId: e.target.value }))
+                                                        let parms = new URLSearchParams(location.search)
+                                                        parms.set('formId', e.target.value)
+                                                        parms.set("page", 1);
+                                                        parms.set("rows", 10);
+                                                        navigateWithNewParams(parms)
+                                                    }
+                                                    }
+                                                >
+                                                    <option selected>Open this select Form</option>
+                                                    {data.formsByProject?.map((item) => (
+                                                        <option key={item?._id} value={item?._id}>
+                                                            {item?.title}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </div>
-
-                            {data.formsByProject && (
-                                <div className="m-3">
-                                    <label className='mb-1'>Forms</label>
-                                    <select
-                                        className="form-select"
-                                        value={data?.formId}
-                                        onChange={(e) => {
-
-                                            setData((prev) => ({ ...prev, formId: e.target.value }))
-                                            let parms = new URLSearchParams(location.search)
-                                            parms.set('formId', e.target.value)
-                                            parms.set("page", 1);
-                                            parms.set("rows", 10);
-                                            navigateWithNewParams(parms)
-                                        }
-                                        }
-                                    >
-                                        <option selected>Open this select Form</option>
-                                        {data.formsByProject?.map((item) => (
-                                            <option key={item?._id} value={item?._id}>
-                                                {item?.title}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            )}
-                        </>
-                    )}
-                </div>
-                <IoMdRefresh className='cursor-pointer' size={24} onClick={() => fetchData()} />
-                <Button onClick={() => getFormData(data?.refererId, true)} className='my-4'>Download</Button>
-            </div>
-            <LeadsTable
-                rows={rows}
-                page={page}
-                total={total}
-                goToNextPage={goToNextPage}
-                goToPrevPage={goToPrevPage}
-                hasNextPage={hasNextPage}
-                tableHeaders={data?.headers}
-                tableData={data?.values}
-                utmParameters={data.utmParameters}
-                updateRowsPerPage={updateRowsPerPage}
-            />
-        </div>
+                            <IoMdRefresh className='cursor-pointer' size={24} onClick={() => fetchData()} />
+                            <Button onClick={() => getFormData(data?.refererId, true)} className='my-4'>Download</Button>
+                        </div>
+                        <LeadsTable
+                            rows={rows}
+                            page={page}
+                            total={total}
+                            goToNextPage={goToNextPage}
+                            goToPrevPage={goToPrevPage}
+                            hasNextPage={hasNextPage}
+                            tableHeaders={data?.headers}
+                            tableData={data?.values}
+                            utmParameters={data.utmParameters}
+                            updateRowsPerPage={updateRowsPerPage}
+                        />
+                    </div>
+            }
+        </>
     );
 };
 
