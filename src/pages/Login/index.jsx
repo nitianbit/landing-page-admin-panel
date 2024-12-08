@@ -28,8 +28,8 @@ const Login = () => {
             setIsLoggedIn(true);
             success("Login Successful");
             navigate('/fields');
-        } catch (error) {
-            error("Login Failed");
+        } catch (e) {
+            error(e?.message ??"Login Failed");
         }
     };
 

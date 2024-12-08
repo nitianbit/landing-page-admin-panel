@@ -1,16 +1,40 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const usePagination = () => {
     const [page, setPage] = useState(1);
     const [rows, setRows] = useState(10);
     const [total, setTotal] = useState(1);
 
+    const location = useLocation();
+    const navigate = useNavigate()
+
+    const navigateWithNewParams = useCallback((params) => {
+        navigate({
+            pathname: location.pathname,
+            search: `?${params.toString()}`,
+            replace: true,
+        });
+    }, [location.pathname, navigate, rows,]);
+
+
     const goToNextPage = () => {
-        setPage(prev => Math.min(prev + 1, total))
+        setPage(prev => {
+            const next = Math.min(prev + 1, total)
+            let parms = new URLSearchParams(location.search)
+            parms.set("page", next);
+            navigateWithNewParams(parms)
+        })
     }
 
     const goToPrevPage = () => {
-            setPage(prev => Math.max(prev-1, 1))
+
+        setPage(prev => {
+            const next = Math.max(prev - 1, 1)
+            let parms = new URLSearchParams(location.search)
+            parms.set("page", next);
+            navigateWithNewParams(parms)
+        })
     }
 
     const updateTotal = (total) => {
@@ -20,11 +44,39 @@ export const usePagination = () => {
     const updateRowsPerPage = (newRows) => {
         setRows(newRows);
         setPage(1);
+        let parms = new URLSearchParams(location.search)
+        parms.set("page", 1);
+        parms.set("rows", newRows);
+        navigateWithNewParams(parms)
     };
 
-    const hasNextPage = ()=>{
+    const hasNextPage = () => {
         return page < total
     }
 
-    return { page, rows, total, goToNextPage, goToPrevPage, updateTotal, hasNextPage,updateRowsPerPage }
+    const resetPageRows = () => {
+        setPage(1);
+        setRows(10)
+
+        let parms = new URLSearchParams(location.search)
+        parms.set("page", 1);
+        parms.set("rows", 10);
+        navigateWithNewParams(parms)
+    }
+
+    const updatePage = (page) => {
+        setPage(page)
+        let parms = new URLSearchParams(location.search)
+        parms.set("page", page);
+        navigateWithNewParams(parms)
+    }
+
+    const updateRows = (row) => {
+        setRows(row)
+        let parms = new URLSearchParams(location.search)
+        parms.set("rows", row);
+        navigateWithNewParams(parms)
+    }
+
+    return { page, rows, total, goToNextPage, goToPrevPage, updateTotal, hasNextPage, updateRowsPerPage, resetPageRows, updatePage, updateRows }
 }
