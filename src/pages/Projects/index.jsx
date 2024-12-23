@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { ProjectTable } from '../../components'
-import { ENDPOINTS } from './Constant';
-import { doGET } from '../../utils/HttpUtil';
+import AddIcon from "@mui/icons-material/Add";
+import ProjectDialog from './Dialog';
+import { Box, Button } from '@mui/material';
 
 const Projects = () => {
-
-    const [projects, setProjects] = useState()
-
-    const getAllProjects = async (e) => {
-        try {
-            const response = await doGET(ENDPOINTS.getProjects);
-            setProjects(response)
-        } catch (error) { }
+    const [open, setOpen] = React.useState(false);
+    const handleClickOpen = () => {
+        setOpen(true);
     };
-
-    useEffect(() => {
-        getAllProjects()
-    }, [])
-
     return (
-        <div className='d-flex w-100'>
-            <ProjectTable getAllProjects={getAllProjects} tableData={projects} />
-        </div>
+        <Box>
+            <Button
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={handleClickOpen}
+            >
+                Add Project
+            </Button>
+            <ProjectDialog
+                open={open}
+                setOpen={setOpen}
+            />
+            <ProjectTable  openDialog={handleClickOpen}/>
+        </Box>
     )
 }
 

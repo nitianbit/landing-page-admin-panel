@@ -1,160 +1,105 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { MdEdit, MdDelete } from "react-icons/md";
-import Modal from '../Modal/Modal';
-import { ENDPOINTS } from '../../pages/Projects/Constant';
-import { doDELETE, doPOST, doPUT } from '../../utils/HttpUtil';
-import { AppContext } from '../../services/context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useProjectStore } from '../../pages/Projects/Service';
+import ConfirmationDialog from '../Modal/ConfirmationModal';
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
+import DeleteIcon from "@mui/icons-material/Delete";
+import Editcon from "@mui/icons-material/Edit";
 
-const ProjectTable = ({ tableData, getAllProjects }) => {
+const ProjectTable = ({openDialog }) => {
+    const { data, fetchGrid, onDelete, onPageChange, rows,fetchDetail, currentPage, total } = useProjectStore()
+    const [deleteConfirmation, setDeleteConfirmation] = useState({
+        visible: false,
+        data: false
+    });
 
-    const navigate = useNavigate();
+    const handleOpenDialog = (data) => setDeleteConfirmation({ visible: true, data });
+    const handleCloseDialog = () => setDeleteConfirmation({ visible: false, data: null });
 
-    const { success, error } = useContext(AppContext)
 
-    const [data, setData] = useState(tableData?.rows);
-    const [loading, setLoading] = useState(false)
-    const [deleteProjectId, setDeleteProjectId] = useState(null)
-    const [editState, setEditState] = useState({
-        isModalOpen: false,
-        selectedProject: null
-    })
-
-    const handleUpdateData = async () => {
-        try {
-            setLoading(true)
-            if (!editState.selectedProject?._id) {
-                await doPOST(ENDPOINTS.addProject, editState.selectedProject)
-            } else {
-                await doPUT(ENDPOINTS.updateProject(editState.selectedProject?._id), editState.selectedProject)
-            }
-            setEditState({
-                isModalOpen: false,
-                selectedProject: null
-            })
-            getAllProjects()
-            success("Project Updated Successfully")
-        } catch (e) {
-            error("Server error")
-        } finally {
-            setLoading(false)
-
-        }
+    const onActionClick = (data) => {
+        handleOpenDialog(data);
     }
 
-    const updateData = (updatedObj) => setEditState(prev => ({
-        ...prev,
-        selectedProject: {
-            ...prev.selectedProject,
-            ...updatedObj
-        }
-    }))
-
-
-    const openModal = (selectedProject) => {
-        setEditState(prev => ({
-            ...prev,
-            isModalOpen: true,
-            selectedProject
-        }));
-    };
-
-
-    const closeEditModal = () => {
-        setEditState(prev => ({
-            ...prev,
-            isModalOpen: false,
-            selectedProject: null
-        }));
-    };
-
-    const deleteProject = async () => {
+    const handleConfirm = () => {
         try {
-            setLoading(true)
-            const response = await doDELETE(ENDPOINTS.deleteProject(deleteProjectId))
-            setDeleteProjectId(null)
-            getAllProjects()
-            success("Project deleted Successfully")
+            onDelete(deleteConfirmation.data);
+            handleCloseDialog();
         } catch (error) {
-            error("server error")
 
         }
-        finally {
-            setLoading(false)
-        }
-    }
+    };
 
-    const closeDeleteModal = () => {
-        setDeleteProjectId(null)
-    }
+    const handleEdit = async (id) => {
+        await fetchDetail(id); // Ensure data is fetched before opening
+        openDialog()
+    };
+    
 
     useEffect(() => {
-        setData(tableData)
-    }, [tableData])
+        if(data.length == 0){
+            fetchGrid();
+        }
+    }, []);
 
     return (
-        <div className='w-100'>
-            <button onClick={(e) => {
-                // openModal(true);
-                navigate("/projects/create")
-            }} className="btn btn-primary my-2" type="submit">Add Project</button>
-            <div className="container shadow-sm bg-white p-2 w-100">
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead style={{ fontWeight: 600 }}>
-                            <tr>
-                                <th className='font-weight-600' scope="col">#</th>
-                                <th className='font-weight-600' scope="col">Name</th>
-                                <th className='font-weight-600' scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className='text-grey'>
-                            {data?.map((row, index) => (
-                                <tr key={row?.id}>
-                                    <th scope="row">{index + 1}</th>
-                                    <td>{row.name}</td>
-                                    <td>
-                                        <MdEdit onClick={() => {
-                                            navigate(`/projects/edit/${row?._id}`)
-                                        }} className='cursor-pointer' color='#8296EE' />
-                                        <MdDelete onClick={() => {
-                                            setDeleteProjectId(row?._id)
-                                        }} className='cursor-pointer' color='red' />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <div className="d-flex justify-content-between align-items-center">
-                        <div className="hint-text me-2 text-grey">Showing <b>{data?.length ?? 0}</b> out of <b>{tableData?.total ?? 0}</b> entries</div>
-                        <ul className="pagination mb-0">
-                            <li className="page-item">
-                                <a className="page-link" href="#" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li className="page-item"><a className="page-link" href="#">1</a></li>
-                            <li className="page-item"><a className="page-link" href="#">2</a></li>
-                            <li className="page-item"><a className="page-link" href="#">3</a></li>
-                            <li className="page-item">
-                                <a className="page-link" href="#" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+        <Box mt={2}>
+            <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
+                <Table sx={{ minWidth: 650, position: "relative" }} aria-label="general table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Sr No.</TableCell>
+                            <TableCell >Name</TableCell>
+                            <TableCell>Domain</TableCell>
+                            <TableCell
+                            >
+                                ACTIONS
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {data.length > 0 &&
+                            data.map((row, rowIndex) => (
+                                <TableRow key={rowIndex} style={{ textDecoration: "none", color: "inherit" }}>
+                                    <TableCell>
+                                        {rowIndex + 1}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row?.name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row?.domain}
+                                    </TableCell>
 
-            </div>
-            {deleteProjectId && <Modal
-                header="Delete Project"
-                onSave={deleteProject}
-                content="Are You Sure you want to delete this Project?"
-                isOpen={deleteProjectId ? true : false}
-                okText="Delete"
-                onClose={closeDeleteModal} />
-            }
-        </div>
+                                    <TableCell>
+                                    <Editcon color='success' sx={{cursor:"pointer"}} onClick={()=>{
+                                        handleEdit(row?._id)
+                                    }}/>
+
+                                    <DeleteIcon variant="outlined" color='error' sx={{cursor:"pointer"}} onClick={() => onActionClick(row?._id)} />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <TablePagination
+                rowsPerPageOptions={[2]}
+                component="div"
+                count={total}
+                rowsPerPage={2}
+                page={currentPage - 1}
+                onPageChange={onPageChange}
+            />
+            <ConfirmationDialog
+                open={deleteConfirmation.visible}
+                title="Delete Confirmation"
+                message="Are you sure you want to delete this item? This action cannot be undone."
+                onConfirm={handleConfirm}
+                onCancel={handleCloseDialog}
+                confirmText="Delete"
+                cancelText="Cancel"
+            />
+        </Box>
     );
 };
 
