@@ -1,7 +1,7 @@
 export const ENDPOINTS = {
-    addProject: `addProject`,
-    getProjects: `getProjects`,
-    getProjectById: (id) => `project/${id}`,
-    updateProject: (id) => `project/${id}`,
-    deleteProject: (id) => `project/${id}`,
+    create: `addProject`,
+    grid: `getProjects`,
+    detail: (id) => `project/${id}`,
+    update: (id) => `project/${id}`,
+    delete: (id) => `project/${id}`,
 }
