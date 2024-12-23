@@ -1,28 +1,58 @@
-import React, { useEffect, useState } from 'react'
-import { UserTable } from '../../components'
-import { FieldENDPOINTS } from './Constant';
-import { doGET } from '../../utils/HttpUtil';
-import FieldTable from '../../components/Table/FieldTable';
+import React, { useEffect } from 'react'
+import { COLUMNS } from './Constant';
+import GridTable from '../../components/Table/GridTable';
+import { useFieldsStore } from './Service';
+import FieldDrawer from './FieldDrawer';
+import AddIcon from "@mui/icons-material/Add";
+import { Box, Button } from '@mui/material';
 
 const Field = () => {
-
-    const [users, setUsers] = useState()
-
-    const getAllFields = async (e) => {
-        try {
-            const response = await doGET(FieldENDPOINTS.getFields);
-            setUsers(response)
-        } catch (error) { }
+    const { data, rows, fetchGrid, isLoading, onDelete, onPageChange, currentPage,fetchDetail, onRowsPerPageChange, totalPages, total, onUpdate } = useFieldsStore();
+    const [open, setOpen] = React.useState(false);
+    const handleClickOpen = () => {
+        setOpen(true);
     };
-
+    const handleEdit = async (id)=>[
+        await fetchDetail(id),
+        handleClickOpen()
+    ]
     useEffect(() => {
-        getAllFields()
+        if(data.length == 0){
+            fetchGrid()
+        }
     }, [])
 
     return (
-        <div className='d-flex w-100'>
-            <FieldTable getAllFields={getAllFields} tableData={users} />
-        </div>
+        <Box>
+            <Button
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={handleClickOpen}
+            >
+                Add Field
+            </Button>
+            <GridTable
+                data={data}
+                columns={COLUMNS}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                total={total}
+                rows={rows}
+                loading={isLoading}
+                onPageChange={onPageChange}
+                onRowsPerPageChange={onRowsPerPageChange}
+                onDelete={(data) => {
+                    onDelete(data._id)
+                }}
+                onEdit={handleEdit}
+                fetchDetail={fetchGrid}
+            />
+
+            <FieldDrawer
+                open={open}
+                setOpen={setOpen}
+            />
+        </Box>
     )
 }
 
