@@ -3,9 +3,9 @@ import { STORAGE_KEYS, getValue } from "../Storage";
 import { API_METHODS } from "./constants";
 
 const api = axios.create({
-    // baseURL: 'http://localhost:5400/api',
-    baseURL: "https://api.apkiproperty.com/api",
-    timeout: 10000,
+    baseURL: 'http://localhost:5400/api',
+    // baseURL: "https://api.apkiproperty.com/api",
+    // timeout: 10000,
 });
 
 const apiHandler = async (endPoint, method, data = null) => {
@@ -20,23 +20,51 @@ const apiHandler = async (endPoint, method, data = null) => {
             },
         });
 
-        return response.data;
+        return { error: false, message: "", status: response.status, data: response.data };
     } catch (error) {
-        //handle 401 here
-        if (error?.response?.status == 401) {
-                 localStorage.clear()
-                 window.location.pathname = "/"
-        }
+        let errorMessage = 'An error occurred.';
+        let statusCode = 500;
+
+        // Check if the error has a response object (indicating a server-side issue)
         if (error.response) {
-            console.error("Response Error:", error.response.data);
-            throw new Error(error.response.data.message || "Something went wrong");
-        } else if (error.request) {
-            console.error("Request Error:", error.request);
-            throw new Error("Request failed. Please try again later.");
-        } else {
-            console.error("Error:", error.message);
-            throw new Error("An unexpected error occurred. Please try again.");
+            const { status, data } = error.response;
+            statusCode = status;
+
+            // Handle different HTTP status codes
+            switch (status) {
+                case 400:
+                    errorMessage = data.message || 'Bad Request: The server could not understand the request.';
+                    break;
+                case 401:
+                    errorMessage = data.message || 'Unauthorized: Authentication is required.';
+                    break;
+                case 403:
+                    errorMessage = data.message || 'Forbidden: You do not have permission to access this resource.';
+                    break;
+                case 404:
+                    errorMessage = data.message || 'Not Found: The requested resource could not be found.';
+                    break;
+                case 500:
+                    errorMessage = data.message || 'Internal Server Error: There is an issue with the server.';
+                    break;
+                default:
+                    errorMessage = data.message || `Unexpected Error: ${status}`;
+                    break;
+            }
         }
+        // If there is no response object, it could be a network error or timeout
+        else if (error.request) {
+            console.error('No response received:', error.request);
+            errorMessage = 'Network Error: No response received from server.';
+        }
+        // Handle errors related to setting up the request
+        else {
+            console.error('Error in setting up request:', error.message);
+            errorMessage = `Error: ${error.message}`;
+        }
+
+        // Return the error message to the caller
+        return { error: true, message: errorMessage, status: statusCode, data:{} };
     }
 };
 

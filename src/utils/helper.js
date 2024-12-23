@@ -53,3 +53,8 @@ try {
 } catch (error) {
     console.error(error.message);
 }
+
+
+export const isEmptyObject = (obj) => {
+    return Object.keys(obj).length === 0;
+}
