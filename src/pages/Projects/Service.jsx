@@ -38,7 +38,7 @@ const store = create((set, get) => ({
                 showError(response.message);
             }
         } catch (err) {
-            showError('Failed to fetch doctors');
+            showError('Failed to fetch Fields');
         } finally {
             set({ isLoading: false });
         }
@@ -76,6 +76,15 @@ const store = create((set, get) => ({
             })
             fetchGrid();
         }
+    },
+
+    onRowsPerPageChange: (event, page) => {
+        const {fetchGrid } = get();
+        set({
+            rows: (parseInt(event.target.value, 10)),
+            currentPage: 1
+        })
+        fetchGrid()
     },
 
     fetchDetail: async (id) => {
