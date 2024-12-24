@@ -23,3 +23,8 @@
   content:" *";
   color: red;
 }
+
+.delete-icon{
+  color: red;
+  cursor: pointer;
+}
