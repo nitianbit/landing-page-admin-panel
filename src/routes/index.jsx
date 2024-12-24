@@ -1,4 +1,4 @@
-import { Dashboard, Users, Field, Projects, EditProject, Login, Signup, Products, EditProduct } from '../pages'
+import { Dashboard, Users, Field, Projects, Login, Signup, Products, EditProduct } from '../pages'
 import Leads from '../pages/Leads';
 
 export const authRoutes = [
@@ -34,14 +34,6 @@ export const protectedRoutes = [
         path: "/projects",
         element: <Projects />
     },
-    {
-        path: "/projects/create",
-        element: <EditProject />
-    },
-    {
-        path: "/projects/edit/:projectId",
-        element: <EditProject />
-    }
     ,
     {
         path: "/leads",
